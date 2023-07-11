@@ -1,6 +1,6 @@
 import {
+   ref,
    onMounted,
-   reactive,
    onBeforeUnmount,
    unref,
    toRefs,
@@ -40,7 +40,7 @@ const defaults: Options = {
 export function useFixedHeader(target: MaybeTemplateRef, options: Partial<Options> = defaults) {
    const mergedOptions = { ...defaults, ...options }
 
-   const data = reactive({ enterDelta: 0, leaveDelta: 0, isVisible: false })
+   const isVisible = ref(false)
 
    // Utils
 
@@ -108,8 +108,8 @@ export function useFixedHeader(target: MaybeTemplateRef, options: Partial<Option
    const onScroll = createScrollHandler()
 
    function createScrollHandler() {
-      let captureenterDelta = true
-      let captureleaveDelta = true
+      let captureEnterDelta = true
+      let captureLeaveDelta = true
 
       let prevTop = 0
 
@@ -147,36 +147,34 @@ export function useFixedHeader(target: MaybeTemplateRef, options: Partial<Option
          if (isTopReached) {
             console.log('Top Reached')
 
-            data.isVisible = true
+            isVisible.value = true
          } else {
             if (prevTop !== 0) {
                if (isScrollingUp) {
                   console.log('Scrolling up')
 
-                  if (captureenterDelta) {
-                     captureenterDelta = false
+                  if (captureEnterDelta) {
+                     captureEnterDelta = false
 
                      captureDelta((value) => {
-                        data.enterDelta = value
-                        captureenterDelta = true
+                        captureEnterDelta = true
 
                         if (value >= mergedOptions.enterDelta) {
-                           data.isVisible = true
+                           isVisible.value = true
                         }
                      })
                   }
                } else if (isScrollingDown) {
                   console.log('Scrolling down')
 
-                  if (captureleaveDelta) {
-                     captureleaveDelta = false
+                  if (captureLeaveDelta) {
+                     captureLeaveDelta = false
 
                      captureDelta((value) => {
-                        data.leaveDelta = value
-                        captureleaveDelta = true
+                        captureLeaveDelta = true
 
                         if (value >= mergedOptions.leaveDelta) {
-                           data.isVisible = false
+                           isVisible.value = false
                         }
                      })
                   }
@@ -216,9 +214,9 @@ export function useFixedHeader(target: MaybeTemplateRef, options: Partial<Option
    // Watchers
 
    watch(
-      () => data.isVisible,
-      (isVisible) => {
-         if (isVisible) {
+      isVisible,
+      (_isVisible) => {
+         if (_isVisible) {
             setStyles({ ...mergedOptions.enterStyles, visibility: 'visible' })
          } else {
             setStyles(mergedOptions.leaveStyles)
@@ -227,7 +225,7 @@ export function useFixedHeader(target: MaybeTemplateRef, options: Partial<Option
             if (!el) return
 
             el.ontransitionend = () => {
-               if (!data.isVisible) setStyles({ visibility: 'hidden' })
+               if (!isVisible.value) setStyles({ visibility: 'hidden' })
                el.ontransitionend = null
             }
          }
@@ -235,5 +233,5 @@ export function useFixedHeader(target: MaybeTemplateRef, options: Partial<Option
       { flush: 'sync' }
    )
 
-   return toRefs(data)
+   return { isVisible }
 }
