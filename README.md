@@ -12,8 +12,8 @@ Turn your boring fixed header into a smart and beautiful one.
 
 -  **Dead simple** - Few props and you're done
 -  **Lightweight** - Less than 1kb without dependencies
--  **Smart** - when scrolling down, the header is hidden, when scrolling up, the header is shown
--  **Fine-grained** - Visibility behaves correctly on page load, top-of-page, and bottom-of-page
+-  **Smart** - When scrolling down, the header is hidden, when scrolling up, the header is shown
+-  **Fine-grained** - Visibility behaves correctly on page load and on top reached
 -  **Beautiful** - Beatiful transition are applied by default and can be customized
 -  **Customizable** - Touch the acceleration delta for both hiding and showing and use any scrolling container
 
@@ -87,4 +87,4 @@ const { isVisible } = useFixedHeader(headerRef, {
 
 ## License
 
-MIT
+MIT Licensed - Simone Mastromattei © 2023

@@ -1,0 +1,61 @@
+:root {
+   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+   line-height: 1.5;
+   background-image: var(--Gradient);
+   -webkit-font-smoothing: antialiased;
+   -moz-osx-font-smoothing: grayscale;
+   text-rendering: optimizeLegibility;
+}
+
+:root {
+   --AccentColor: #00976b;
+   --TextColor: #494949;
+   --WhiteColor: #fff;
+   --Gradient: linear-gradient(to top, #00ff8d 0%, #00c68c 100%);
+}
+
+:root {
+   --shadow-color: 220 3% 15%;
+   --shadow-strength: 1%;
+   --Shadow: 0 -1px 3px 0 hsl(var(--shadow-color) / calc(var(--shadow-strength) + 2%)),
+      0 1px 2px -5px hsl(var(--shadow-color) / calc(var(--shadow-strength) + 2%)),
+      0 2px 5px -5px hsl(var(--shadow-color) / calc(var(--shadow-strength) + 4%)),
+      0 4px 12px -5px hsl(var(--shadow-color) / calc(var(--shadow-strength) + 5%)),
+      0 12px 15px -5px hsl(var(--shadow-color) / calc(var(--shadow-strength) + 7%));
+}
+
+* {
+   box-sizing: border-box;
+}
+
+html,
+body,
+h1,
+h2,
+h3,
+ul,
+li {
+   margin: 0;
+   padding: 0;
+}
+
+.Global_VisuallyHidden {
+   clip: rect(0 0 0 0);
+   clip-path: inset(50%);
+   height: 1px;
+   overflow: hidden;
+   position: absolute;
+   white-space: nowrap;
+   width: 1px;
+}
+
+.Global_Logo {
+   text-transform: uppercase;
+   line-height: 1;
+   user-select: none;
+   color: var(--TextColor);
+}
+
+.Global_Logo::first-letter {
+   opacity: 0.15;
+}

@@ -1,74 +1,53 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useFixedHeader } from '../src/useFixedHeader'
-
-const headerRef = ref<HTMLElement | null>(null)
-
-const containerRef = ref<HTMLElement | null>(null)
-const headerContainerRef = ref<HTMLElement | null>(null)
-
-const { isVisible, delta } = useFixedHeader(headerRef, {
-   hideDelta: 0.5,
-   showDelta: 0.5,
-})
-
-useFixedHeader(headerContainerRef, {
-   root: containerRef,
-   hideDelta: 0.5,
-   showDelta: 0.5,
-})
+import Header from './Header.vue'
+import WithContainer from './WithContainer.vue'
 </script>
 
 <template>
    <div>
-      <header class="Header" ref="headerRef">
-         {{ delta }} {{ isVisible }}
+      <Header />
 
-         <h3>Vue 3 + Vite + TypeScript + Tailwind CSS</h3>
-      </header>
-
-      <div class="Page"></div>
-
-      <div class="Container_Scroll" ref="containerRef">
-         <div class="Container">
-            <header class="HeaderContainer" ref="headerContainerRef">
-               {{ delta }} {{ isVisible }}
-
-               <h3>Vue 3 + Vite + TypeScript + Tailwind CSS</h3>
-            </header>
+      <div class="Content">
+         <div class="Global_VisuallyHidden">
+            <h1>Vue Use Fixed Header</h1>
+            <p>Turn your boring fixed header into a smart and beautiful one.</p>
          </div>
+
+         <WithContainer />
       </div>
+
+      <footer class="Footer">
+         <div>
+            Made by <a target="_blank" href="https://github.com/smastrom">@smastrom</a> - MIT
+            Licensed
+         </div>
+      </footer>
    </div>
 </template>
 
 <style scoped>
-.Header {
-   background-color: white;
-   width: 100%;
-   height: 80px;
-   top: 0;
-   position: sticky;
-}
-.Page {
-   height: 4000px;
+.Content {
+   height: 1700px;
+   display: flex;
+   flex-direction: column;
+   padding: 1rem;
 }
 
-.Container_Scroll {
-   height: 400px;
-   overflow: auto;
-   background-color: white;
+.Footer {
+   display: flex;
+   justify-content: center;
+   padding: 2rem 1rem;
+   color: var(--TextColor);
 }
 
-.Container {
-   height: 1800px;
-   position: relative;
-   background-color: white;
+.Footer a {
+   color: var(--TextColor);
+   transition: color 200ms ease-in-out;
 }
 
-.HeaderContainer {
-   height: 60px;
-   position: sticky;
-   top: 0;
-   background-color: aquamarine;
+@media (hover: hover) {
+   .Footer a:hover {
+      color: var(--AccentColor);
+   }
 }
 </style>
