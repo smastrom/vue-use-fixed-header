@@ -139,45 +139,34 @@ export function useFixedHeader(target: MaybeTemplateRef, options: Partial<Option
          const el = unref(target)
          if (!el) return
 
-         const isTopReached = getScrollTop() <= getHeaderHeight(el) * 2
-
+         const isTopReached = getScrollTop() <= getHeaderHeight(el)
          const isScrollingUp = getScrollTop() < prevTop
          const isScrollingDown = getScrollTop() > prevTop
 
          if (isTopReached) {
-            console.log('Top Reached')
-
             isVisible.value = true
          } else {
             if (prevTop !== 0) {
-               if (isScrollingUp) {
-                  console.log('Scrolling up')
+               if (isScrollingUp && captureEnterDelta) {
+                  captureEnterDelta = false
 
-                  if (captureEnterDelta) {
-                     captureEnterDelta = false
+                  captureDelta((value) => {
+                     if (value >= mergedOptions.enterDelta) {
+                        isVisible.value = true
+                     }
 
-                     captureDelta((value) => {
-                        captureEnterDelta = true
+                     captureEnterDelta = true
+                  })
+               } else if (isScrollingDown && captureLeaveDelta) {
+                  captureLeaveDelta = false
 
-                        if (value >= mergedOptions.enterDelta) {
-                           isVisible.value = true
-                        }
-                     })
-                  }
-               } else if (isScrollingDown) {
-                  console.log('Scrolling down')
+                  captureDelta((value) => {
+                     if (value >= mergedOptions.leaveDelta) {
+                        isVisible.value = false
+                     }
 
-                  if (captureLeaveDelta) {
-                     captureLeaveDelta = false
-
-                     captureDelta((value) => {
-                        captureLeaveDelta = true
-
-                        if (value >= mergedOptions.leaveDelta) {
-                           isVisible.value = false
-                        }
-                     })
-                  }
+                     captureLeaveDelta = true
+                  })
                }
             }
          }
