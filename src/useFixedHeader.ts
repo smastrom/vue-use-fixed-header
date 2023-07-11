@@ -12,7 +12,8 @@ import {
 type MaybeTemplateRef = HTMLElement | null | Ref<HTMLElement | null>
 
 interface Options {
-   delta: number
+   hideDelta: number
+   showDelta: number
    root: MaybeTemplateRef
    enterStyles: CSSProperties
    leaveStyles: CSSProperties
@@ -21,7 +22,8 @@ interface Options {
 const easing = 'cubic-bezier(0.16, 1, 0.3, 1)'
 
 const defaults: Options = {
-   delta: 0.5,
+   showDelta: 0.5,
+   hideDelta: 0.25,
    root: null,
    enterStyles: {
       transition: `transform 300ms ${easing}`,
@@ -38,7 +40,7 @@ const defaults: Options = {
 export function useFixedHeader(target: MaybeTemplateRef, options: Partial<Options> = defaults) {
    const mergedOptions = { ...defaults, ...options }
 
-   const data = reactive({ delta: 0, isVisible: false })
+   const data = reactive({ showDelta: 0, hideDelta: 0, isVisible: false })
 
    // Utils
 
@@ -106,10 +108,12 @@ export function useFixedHeader(target: MaybeTemplateRef, options: Partial<Option
    const onScroll = createScrollHandler()
 
    function createScrollHandler() {
-      let prevTop = 0
-      let captureDelta = true
+      let captureShowDelta = true
+      let captureHideDelta = true
 
-      function setDelta() {
+      let prevTop = 0
+
+      function captureDelta(onCaptured: (value: number) => void) {
          let rafId: DOMHighResTimeStamp | undefined = undefined
          let frameCount = 0
 
@@ -120,9 +124,7 @@ export function useFixedHeader(target: MaybeTemplateRef, options: Partial<Option
             const nextY = getScrollTop()
 
             if (frameCount === 10) {
-               data.delta = (startY - nextY) / (performance.now() - startMs)
-               captureDelta = true
-
+               onCaptured(Math.abs(startY - nextY) / (performance.now() - startMs))
                cancelAnimationFrame(rafId as DOMHighResTimeStamp)
             } else {
                frameCount++
@@ -151,18 +153,33 @@ export function useFixedHeader(target: MaybeTemplateRef, options: Partial<Option
                if (isScrollingUp) {
                   console.log('Scrolling up')
 
-                  if (captureDelta) {
-                     captureDelta = false
-                     setDelta()
+                  if (captureShowDelta) {
+                     captureShowDelta = false
 
-                     if (data.delta >= mergedOptions.delta) {
-                        data.isVisible = true
-                     }
+                     captureDelta((value) => {
+                        data.showDelta = value
+                        captureShowDelta = true
+
+                        if (value >= mergedOptions.showDelta) {
+                           data.isVisible = true
+                        }
+                     })
                   }
                } else if (isScrollingDown) {
                   console.log('Scrolling down')
 
-                  data.isVisible = false
+                  if (captureHideDelta) {
+                     captureHideDelta = false
+
+                     captureDelta((value) => {
+                        data.hideDelta = value
+                        captureHideDelta = true
+
+                        if (value >= mergedOptions.hideDelta) {
+                           data.isVisible = false
+                        }
+                     })
+                  }
                }
             }
          }

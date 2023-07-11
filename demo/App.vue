@@ -8,12 +8,14 @@ const containerRef = ref<HTMLElement | null>(null)
 const headerContainerRef = ref<HTMLElement | null>(null)
 
 const { isVisible, delta } = useFixedHeader(headerRef, {
-   delta: 0.5,
+   hideDelta: 0.5,
+   showDelta: 0.5,
 })
 
 useFixedHeader(headerContainerRef, {
    root: containerRef,
-   delta: 0.5,
+   hideDelta: 0.5,
+   showDelta: 0.5,
 })
 </script>
 
