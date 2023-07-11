@@ -1,49 +1,90 @@
-# vue-fixed
+# Vue Use Fixed Header
 
-### A dead-simple smart fixed header for Vue.js
-
-<br />
-
-## Why should you use it?
-
--  It's dead simple: few props and you're done
--  It's lightweight: just 600B
--  It's smart: when scrolling down, the header is hidden, when scrolling up, the header is shown
--  It's customizable: touch the acceleration delta to make it more or less sensitive
+Turn your boring fixed header into a smart and beautiful one.
 
 <br />
 
-## How to use it?
+**Demo:** [Visit Website]() — **Examples:** [Nuxt 3]() - [Vue 3]()
 
-Pass your header's template ref to `useFixed`. If you want you can customize the acceleration delta (default is 800px/s).
+<br />
 
-There's only one thing you need to be careful about, your header should not have any `position` property set since `vue-fixed` takes care of it.
+## Features
 
-```html
-<script setup lang="ts">
-   import { ref } from 'vue'
-   import { useFixed } from 'vue-fixed'
+-  **Dead simple** - Few props and you're done
+-  **Lightweight** - Less than 1kb without dependencies
+-  **Smart** - when scrolling down, the header is hidden, when scrolling up, the header is shown
+-  **Fine-grained** - Visibility behaves correctly on page load, top-of-page, and bottom-of-page
+-  **Beautiful** - Beatiful transition are applied by default and can be customized
+-  **Customizable** - Touch the acceleration delta for both hiding and showing and use any scrolling container
 
-   const headerRef = ref<HTMLElement | null>(null)
+<br />
 
-   const { isFixed } = useFixed(headerRef, {
-      delta: 800,
-   })
+## Usage
+
+Pass your header's template ref to `useFixedHeader`. That's it!
+
+```vue
+<script setup>
+import { ref } from 'vue'
+import { useFixedHeader } from 'vue-use-fixed-header'
+
+const headerRef = ref(null)
+
+useFixedHeader(headerRef)
 </script>
 
 <template>
    <header class="Header" ref="headerRef">
-      <ul>
-         <li><a href="/home">Home</a></li>
-         <li><a href="/about">About</a></li>
-         <li><a href="/contact">Contact</a></li>
-      </ul>
+      <!-- Your content -->
    </header>
 </template>
 
 <style scoped>
-   .Header {
-      /* Your header styles */
-   }
+.Header {
+   position: fixed; /* or sticky */
+   top: 0; /* or whatever */
+   /* Other styles... */
+}
 </style>
 ```
+
+> Do not apply any transition to your header, it will be done automatically for you. See below how to customize them.
+
+<br />
+
+## Customization
+
+```ts
+const { isVisible } = useFixedHeader(headerRef, {
+   /**
+    * Keep null if content is scrolled by the window,
+    * otherwise pass a custom scrolling container ref */
+   root: null,
+   /**
+    * Minimum acceleration delta required to show the header */
+   enterDelta: 0.5,
+   /**
+    * Minimum acceleration delta required to hide the header */
+   leaveDelta: 0.25,
+   /**
+    * Custom entrance transition styles */
+   enterStyles: {
+      transition: `transform 300ms ease-out`,
+      transform: 'translateY(0px)',
+      opacity: 1,
+   },
+   /**
+    * Custom leave transition styles */
+   leaveStyles: {
+      transition: `transform 600ms ease-out, opacity 600ms ease-out`,
+      transform: 'translateY(-100%)',
+      opacity: 0,
+   },
+})
+```
+
+<br />
+
+## License
+
+MIT

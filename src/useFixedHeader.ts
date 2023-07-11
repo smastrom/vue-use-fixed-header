@@ -12,8 +12,8 @@ import {
 type MaybeTemplateRef = HTMLElement | null | Ref<HTMLElement | null>
 
 interface Options {
-   hideDelta: number
-   showDelta: number
+   leaveDelta: number
+   enterDelta: number
    root: MaybeTemplateRef
    enterStyles: CSSProperties
    leaveStyles: CSSProperties
@@ -22,8 +22,8 @@ interface Options {
 const easing = 'cubic-bezier(0.16, 1, 0.3, 1)'
 
 const defaults: Options = {
-   showDelta: 0.5,
-   hideDelta: 0.25,
+   enterDelta: 0.5,
+   leaveDelta: 0.25,
    root: null,
    enterStyles: {
       transition: `transform 300ms ${easing}`,
@@ -40,7 +40,7 @@ const defaults: Options = {
 export function useFixedHeader(target: MaybeTemplateRef, options: Partial<Options> = defaults) {
    const mergedOptions = { ...defaults, ...options }
 
-   const data = reactive({ showDelta: 0, hideDelta: 0, isVisible: false })
+   const data = reactive({ enterDelta: 0, leaveDelta: 0, isVisible: false })
 
    // Utils
 
@@ -108,8 +108,8 @@ export function useFixedHeader(target: MaybeTemplateRef, options: Partial<Option
    const onScroll = createScrollHandler()
 
    function createScrollHandler() {
-      let captureShowDelta = true
-      let captureHideDelta = true
+      let captureenterDelta = true
+      let captureleaveDelta = true
 
       let prevTop = 0
 
@@ -153,14 +153,14 @@ export function useFixedHeader(target: MaybeTemplateRef, options: Partial<Option
                if (isScrollingUp) {
                   console.log('Scrolling up')
 
-                  if (captureShowDelta) {
-                     captureShowDelta = false
+                  if (captureenterDelta) {
+                     captureenterDelta = false
 
                      captureDelta((value) => {
-                        data.showDelta = value
-                        captureShowDelta = true
+                        data.enterDelta = value
+                        captureenterDelta = true
 
-                        if (value >= mergedOptions.showDelta) {
+                        if (value >= mergedOptions.enterDelta) {
                            data.isVisible = true
                         }
                      })
@@ -168,14 +168,14 @@ export function useFixedHeader(target: MaybeTemplateRef, options: Partial<Option
                } else if (isScrollingDown) {
                   console.log('Scrolling down')
 
-                  if (captureHideDelta) {
-                     captureHideDelta = false
+                  if (captureleaveDelta) {
+                     captureleaveDelta = false
 
                      captureDelta((value) => {
-                        data.hideDelta = value
-                        captureHideDelta = true
+                        data.leaveDelta = value
+                        captureleaveDelta = true
 
-                        if (value >= mergedOptions.hideDelta) {
+                        if (value >= mergedOptions.leaveDelta) {
                            data.isVisible = false
                         }
                      })
