@@ -18,7 +18,7 @@ function testScrollDown({ delta, isCustom } = { delta: DEFAULT_LEAVE_DELTA, isCu
    it('Header is visible if scroll delta is lower than hideDelta', () => {
       cy.mountApp(props)
          .waitForIdleScroll()
-         .scrollRootWithDelta({ delta: delta / 2 })
+         .scrollRootWithDelta({ delta: delta / 2, minDuration: 2000 })
          .get('header')
          .should('be.visible')
    })

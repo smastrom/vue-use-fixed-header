@@ -6,7 +6,7 @@ export const CAPTURE_DELTA_FRAME_COUNT = 10
 
 export const DEFAULT_ENTER_DELTA = 0.5
 
-export const DEFAULT_LEAVE_DELTA = 0.25
+export const DEFAULT_LEAVE_DELTA = 0.15
 
 const easing = 'cubic-bezier(0.16, 1, 0.3, 1)'
 
