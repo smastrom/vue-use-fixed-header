@@ -1,6 +1,14 @@
 import 'cypress-wait-frames'
 
-import { DEFAULT_LEAVE_DELTA, IDLE_SCROLL_FRAME_COUNT } from '../../src/constants'
+import { DEFAULT_LEAVE_DELTA, IDLE_SCROLL_FRAME_COUNT, defaultOptions } from '../../src/constants'
+
+import type { CSSProperties } from 'vue'
+
+type ScrollWithDeltaOptions = {
+   delta: number
+   scrollDown?: boolean
+   minDuration?: number
+}
 
 declare global {
    namespace Cypress {
@@ -8,14 +16,9 @@ declare global {
          scrollWithDelta: (options: ScrollWithDeltaOptions) => void
          waitForIdleScroll: () => void
          scrollToHide: () => void
+         checkStyles: (styles: CSSProperties) => void
       }
    }
-}
-
-type ScrollWithDeltaOptions = {
-   delta: number
-   scrollDown?: boolean
-   minDuration?: number
 }
 
 Cypress.Commands.add(
@@ -30,7 +33,7 @@ Cypress.Commands.add(
 
          if (headerHeight && distance < headerHeight) {
             throw new Error(
-               `Scrolling distance (${distance}) is less than ${headerHeight}px. Adjust second parameter (minDuration).`
+               `Scrolling distance (${distance}) is less than ${headerHeight}px. Increase second parameter (minDuration).`
             )
          }
       })
@@ -46,8 +49,13 @@ Cypress.Commands.add('waitForIdleScroll', () => {
 })
 
 Cypress.Commands.add('scrollToHide', () => {
-   // Higher duration will scroll more
    cy.scrollWithDelta({ delta: DEFAULT_LEAVE_DELTA, minDuration: 2000 })
 
    cy.get('header').should('not.be.visible')
+})
+
+Cypress.Commands.add('checkStyles', { prevSubject: 'element' }, (subject, styles) => {
+   Object.entries(styles).forEach(([property, value]) => {
+      cy.wrap(subject).should('have.attr', 'style').and('include', `${property}: ${value}`)
+   })
 })

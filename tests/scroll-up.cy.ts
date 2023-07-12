@@ -1,6 +1,6 @@
 import HeaderFixed from './components/HeaderFixed.vue'
 
-import { DEFAULT_ENTER_DELTA, DEFAULT_LEAVE_DELTA } from '../src/constants'
+import { DEFAULT_ENTER_DELTA } from '../src/constants'
 
 describe('Scroll up', () => {
    describe('Header is visible if scroll delta is equal or above enterDelta', () => {

@@ -15,12 +15,12 @@ export const defaultOptions: UseFixedHeaderOptions = {
    leaveDelta: DEFAULT_LEAVE_DELTA,
    root: null,
    enterStyles: {
-      transition: `transform 300ms ${easing}`,
+      transition: `transform 0.3s ${easing} 0s`,
       transform: 'translateY(0px)',
       opacity: 1,
    },
    leaveStyles: {
-      transition: `transform 600ms ${easing}, opacity 600ms ${easing}`,
+      transition: `transform 0.6s ${easing} 0s, opacity 0.6s ${easing} 0s`,
       transform: 'translateY(-100%)',
       opacity: 0,
    },
