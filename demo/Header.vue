@@ -54,6 +54,7 @@ useFixedHeader(headerRef, {
    left: 0;
    justify-content: center;
    position: fixed;
+   z-index: 10;
 }
 
 .Nav {
