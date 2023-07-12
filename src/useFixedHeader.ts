@@ -1,44 +1,15 @@
-import {
-   ref,
-   onMounted,
-   onBeforeUnmount,
-   unref,
-   toRefs,
-   watch,
-   type CSSProperties,
-   type Ref,
-} from 'vue'
+import { ref, onMounted, onBeforeUnmount, unref, watch, type CSSProperties } from 'vue'
 
-type MaybeTemplateRef = HTMLElement | null | Ref<HTMLElement | null>
+import { mergeDefined } from './utils'
+import { CAPTURE_DELTA_FRAME_COUNT, IDLE_SCROLL_FRAME_COUNT, defaultOptions } from './constants'
 
-interface Options {
-   leaveDelta: number
-   enterDelta: number
-   root: MaybeTemplateRef
-   enterStyles: CSSProperties
-   leaveStyles: CSSProperties
-}
+import type { UseFixedHeaderOptions, MaybeTemplateRef } from './types'
 
-const easing = 'cubic-bezier(0.16, 1, 0.3, 1)'
-
-const defaults: Options = {
-   enterDelta: 0.5,
-   leaveDelta: 0.25,
-   root: null,
-   enterStyles: {
-      transition: `transform 300ms ${easing}`,
-      transform: 'translateY(0px)',
-      opacity: 1,
-   },
-   leaveStyles: {
-      transition: `transform 600ms ${easing}, opacity 600ms ${easing}`,
-      transform: 'translateY(-100%)',
-      opacity: 0,
-   },
-}
-
-export function useFixedHeader(target: MaybeTemplateRef, options: Partial<Options> = defaults) {
-   const mergedOptions = { ...defaults, ...options }
+export function useFixedHeader(
+   target: MaybeTemplateRef,
+   options: Partial<UseFixedHeaderOptions> = defaultOptions
+) {
+   const mergedOptions = mergeDefined(defaultOptions, options)
 
    const isVisible = ref(false)
 
@@ -91,7 +62,7 @@ export function useFixedHeader(target: MaybeTemplateRef, options: Partial<Option
             return requestAnimationFrame(checkIdle)
          }
 
-         if (frameCount === 15) {
+         if (frameCount === IDLE_SCROLL_FRAME_COUNT) {
             onIdle()
             cancelAnimationFrame(rafId as DOMHighResTimeStamp)
          } else {
@@ -123,7 +94,7 @@ export function useFixedHeader(target: MaybeTemplateRef, options: Partial<Option
          function rafDelta() {
             const nextY = getScrollTop()
 
-            if (frameCount === 10) {
+            if (frameCount === CAPTURE_DELTA_FRAME_COUNT) {
                onCaptured(Math.abs(startY - nextY) / (performance.now() - startMs))
                cancelAnimationFrame(rafId as DOMHighResTimeStamp)
             } else {
@@ -151,6 +122,7 @@ export function useFixedHeader(target: MaybeTemplateRef, options: Partial<Option
                   captureEnterDelta = false
 
                   captureDelta((value) => {
+                     console.log(mergedOptions.enterDelta, value)
                      if (value >= mergedOptions.enterDelta) {
                         isVisible.value = true
                      }
