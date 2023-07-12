@@ -1,7 +1,12 @@
 import { ref, onMounted, onBeforeUnmount, unref, watch, type CSSProperties } from 'vue'
 
 import { mergeDefined } from './utils'
-import { CAPTURE_DELTA_FRAME_COUNT, IDLE_SCROLL_FRAME_COUNT, defaultOptions } from './constants'
+import {
+   CAPTURE_DELTA_FRAME_COUNT,
+   VISIBILITY_VISIBLE,
+   VISIBILITY_HIDDEN,
+   defaultOptions,
+} from './constants'
 
 import type { UseFixedHeaderOptions, MaybeTemplateRef } from './types'
 
@@ -13,30 +18,40 @@ export function useFixedHeader(
 
    const isVisible = ref(true)
 
-   let isScrollIdle = false
+   let isListeningScroll = false
 
    // Utils
 
    function getRoot() {
       if (typeof window === 'undefined') return null
       const root = unref(mergedOptions.root)
-      if (root != null && root !== document.documentElement) return root
+      if (root != null) return root
 
-      return document
+      return document.documentElement
    }
 
    function getScrollTop() {
       const root = getRoot()
       if (!root) return 0
-      if (root === document) return document.documentElement.scrollTop
 
       return (root as HTMLElement).scrollTop
    }
 
-   function getHeaderHeight(target: HTMLElement) {
-      let headerHeight = target.scrollHeight
+   function isFixed() {
+      const el = unref(target)
+      if (!el) return false
 
-      const { marginTop, marginBottom } = getComputedStyle(target)
+      const { position, display } = getComputedStyle(el)
+      return (position === 'fixed' || position === 'sticky') && display !== 'none'
+   }
+
+   function getHeaderHeight() {
+      const el = unref(target)
+      if (!el) return 0
+
+      let headerHeight = el.scrollHeight
+
+      const { marginTop, marginBottom } = getComputedStyle(el)
       headerHeight += parseFloat(marginTop) + parseFloat(marginBottom)
 
       return headerHeight
@@ -44,41 +59,57 @@ export function useFixedHeader(
 
    function setStyles(styles: CSSProperties) {
       const el = unref(target)
-      if (!el) return
-
-      Object.assign(el.style, styles)
+      if (el) {
+         Object.assign(el.style, styles)
+      }
    }
 
-   function onScrollIdle(onIdle: () => void) {
-      let rafId: DOMHighResTimeStamp | undefined = undefined
-      let rafPrevY = getScrollTop()
-      let frameCount = 0
+   function removeStyles() {
+      const el = unref(target)
+      if (el) {
+         const properties = Object.keys({
+            ...mergedOptions.enterStyles,
+            ...mergedOptions.leaveStyles,
+         }).concat('visibility')
 
-      function checkIdle() {
-         const rafNextY = getScrollTop()
+         properties.forEach((prop) => el.style.removeProperty(prop))
+      }
+   }
 
-         // If the scroll position has changed, reset and keep checking
-         if (rafPrevY !== rafNextY) {
-            frameCount = 0
-            rafPrevY = rafNextY
-            return requestAnimationFrame(checkIdle)
+   /**
+    * Hides the header on page load/scroll restoration before it
+    * has a chance to paint, only if scroll is instant.
+    *
+    * If not instant (smooth-scroll) 'isBelowHeader' will resolve
+    * to false and the header will be visible until the user scrolls again.
+    */
+   function onInstantScrollRestoration() {
+      requestAnimationFrame(() => {
+         const isBelowHeader = getScrollTop() > getHeaderHeight() * 1.2
+         if (isBelowHeader) {
+            isVisible.value = false
+            setStyles({ ...mergedOptions.leaveStyles, ...VISIBILITY_HIDDEN })
          }
+      })
+   }
 
-         if (frameCount === IDLE_SCROLL_FRAME_COUNT) {
-            onIdle()
-            cancelAnimationFrame(rafId as DOMHighResTimeStamp)
-         } else {
-            frameCount++
-            requestAnimationFrame(checkIdle)
+   function onVisible() {
+      setStyles({ ...mergedOptions.enterStyles, ...VISIBILITY_VISIBLE })
+   }
+
+   function onHidden() {
+      setStyles(mergedOptions.leaveStyles)
+
+      const el = unref(target)
+      if (el) {
+         el.ontransitionend = () => {
+            if (!isVisible.value) setStyles(VISIBILITY_HIDDEN)
+            el.ontransitionend = null
          }
       }
-
-      rafId = requestAnimationFrame(checkIdle)
    }
 
-   // Scroll handler
-
-   const onScroll = createScrollHandler()
+   // Event handlers
 
    function createScrollHandler() {
       let captureEnterDelta = true
@@ -109,10 +140,7 @@ export function useFixedHeader(
       }
 
       return () => {
-         const el = unref(target)
-         if (!el) return
-
-         const isTopReached = getScrollTop() <= getHeaderHeight(el)
+         const isTopReached = getScrollTop() <= getHeaderHeight()
          const isScrollingUp = getScrollTop() < prevTop
          const isScrollingDown = getScrollTop() > prevTop
 
@@ -134,8 +162,6 @@ export function useFixedHeader(
                   captureLeaveDelta = false
 
                   captureDelta((value) => {
-                     console.log(value, mergedOptions.leaveDelta)
-
                      if (value >= mergedOptions.leaveDelta) {
                         isVisible.value = false
                      }
@@ -150,58 +176,94 @@ export function useFixedHeader(
       }
    }
 
-   // Lifecycle
+   const onScroll = createScrollHandler()
 
-   onMounted(() => {
-      const el = unref(target)
-      if (!el) return
+   function toggleFunctionalities() {
+      const isValid = isFixed()
 
-      requestAnimationFrame(() => {
-         if (getScrollTop() > getHeaderHeight(el) * 1.2) {
-            isVisible.value = false
-            setStyles({ ...mergedOptions.leaveStyles, visibility: 'hidden' })
+      if (isListeningScroll) {
+         // If the header is not anymore fixed or sticky
+         if (!isValid) {
+            removeStyles()
+            toggleScollListener(true)
          }
-      })
+         // If was not listening and now is fixed or sticky
+      } else {
+         if (isValid) toggleScollListener()
+      }
+   }
 
-      onScrollIdle(() => {
-         const root = getRoot()
-         if (!root) return
-
-         isScrollIdle = true
-         root.addEventListener('scroll', onScroll, { passive: true })
-      })
-   })
-
-   onBeforeUnmount(() => {
+   function toggleScollListener(isRemove = false) {
       const root = getRoot()
       if (!root) return
 
-      root.removeEventListener('scroll', onScroll)
+      const scrollRoot = root === document.documentElement ? window : root
+      const method = isRemove ? 'removeEventListener' : 'addEventListener'
+
+      scrollRoot[method]('scroll', onScroll, { passive: true })
+
+      isListeningScroll = !isRemove
+   }
+
+   let skipInitial = true
+   let resizeObserver: ResizeObserver | undefined = undefined
+
+   function addResizeObserver() {
+      resizeObserver = new ResizeObserver(() => {
+         if (skipInitial) return (skipInitial = false)
+         toggleFunctionalities()
+      })
+
+      const root = getRoot()
+      if (root) resizeObserver.observe(root)
+   }
+
+   // Lifecycle
+
+   onMounted(() => {
+      /**
+       * Resize listener is added in any case as is in charge
+       * of toggling the scroll listener if the header
+       * turns from fixed/sticky to something else.
+       */
+
+      addResizeObserver()
+
+      if (!isFixed()) return
+
+      /**
+       * Immediately hides the header on page load, this has no effect if
+       * scroll restoration is smooth (nuxt default behavior)
+       */
+      onInstantScrollRestoration()
+
+      /**
+       * This will hide the header in case of smooth-scroll restoration
+       */
+      toggleScollListener()
+   })
+
+   onBeforeUnmount(() => {
+      toggleScollListener(true)
+      resizeObserver?.disconnect()
    })
 
    // Watchers
 
-   watch(
-      isVisible,
-      (isEntering) => {
-         if (!isScrollIdle) return
+   /**
+    * Updates styles once scroll listener is up and running
+    */
+   watch(isVisible, (isEntering) => {
+      if (!isListeningScroll) return
 
-         if (isEntering) {
-            setStyles({ ...mergedOptions.enterStyles, visibility: 'visible' })
-         } else {
-            setStyles(mergedOptions.leaveStyles)
+      if (isEntering) {
+         onVisible()
+      } else {
+         onHidden()
+      }
+   })
 
-            const el = unref(target)
-            if (!el) return
-
-            el.ontransitionend = () => {
-               if (!isVisible.value) setStyles({ visibility: 'hidden' })
-               el.ontransitionend = null
-            }
-         }
-      },
-      { flush: 'sync' }
-   )
+   watch(() => mergedOptions.watch, toggleFunctionalities, { flush: 'post' })
 
    return { isVisible }
 }

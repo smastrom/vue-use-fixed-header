@@ -1,6 +1,6 @@
 import 'cypress-wait-frames'
 
-import { DEFAULT_LEAVE_DELTA, IDLE_SCROLL_FRAME_COUNT } from '../../src/constants'
+import { DEFAULT_LEAVE_DELTA } from '../../src/constants'
 import { isCustomContainer } from './constants'
 
 import type { CSSProperties } from 'vue'
@@ -55,7 +55,7 @@ Cypress.Commands.add('waitForIdleScroll', () => {
    cy.waitFrames({
       subject: isCustomContainer ? () => cy.get('.Scroller') : (cy.document as any),
       property: 'scrollTop',
-      frames: IDLE_SCROLL_FRAME_COUNT,
+      frames: 10,
    })
 })
 

@@ -16,9 +16,16 @@ Turn your boring fixed header into a smart animated one.
 -  **Dead simple** - Call a function and you're done
 -  **Lightweight** - 1kb without dependencies
 -  **Smart** - When scrolling down, the header is hidden, when scrolling up, the header is shown
--  **Fine-grained** - Behaves as your users expect on page load and on top reached
--  **Beautiful** - Customizable transition applied by default
--  **Customizable** - Touch the acceleration delta for both hiding and showing and use any scrolling container
+-  **Fine-grained** - Behaves as your users expect on page load, scroll restoration and on top reached
+-  **Customizable** - Touch the acceleration delta for both hiding and showing, use any scrolling container and use your own transition styles
+
+<br />
+
+## Installation
+
+```bash
+pnpm add vue-use-fixed-header
+```
 
 <br />
 

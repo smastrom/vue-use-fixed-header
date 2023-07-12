@@ -20,7 +20,6 @@ useFixedHeader(headerRef, {
                <h2 class="Global_Logo">Vufh</h2>
 
                <a
-                  target="_blank"
                   class="Header_Button"
                   href="https://github.com/smastrom/vue-use-fixed-header/blob/main/demo/WithContainer.vue"
                >

@@ -1,4 +1,4 @@
-export function mergeDefined(defaults: Record<string, any>, options: Record<string, any>) {
+export function mergeDefined<T>(defaults: Required<T>, options: T): Required<T> {
    const result = { ...defaults }
 
    for (const key in options) {
@@ -7,5 +7,5 @@ export function mergeDefined(defaults: Record<string, any>, options: Record<stri
       }
    }
 
-   return result
+   return result as Required<T>
 }
