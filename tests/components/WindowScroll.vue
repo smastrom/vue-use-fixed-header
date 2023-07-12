@@ -5,9 +5,9 @@ import { useFixedHeader } from '../../src/useFixedHeader'
 const props = defineProps<{
    enterDelta?: number
    leaveDelta?: number
-   simulateScrollRestoration?: boolean
    enterStyles?: CSSProperties
    leaveStyles?: CSSProperties
+   simulateScrollRestoration?: boolean
 }>()
 
 const headerRef = ref<HTMLElement | null>(null)

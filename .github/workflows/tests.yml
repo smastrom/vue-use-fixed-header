@@ -18,5 +18,11 @@ jobs:
               run_install: false
          - name: Install dependencies
            run: pnpm install
-         - name: Tests
-           run: pnpm test
+         - name: Test on Chrome
+           run: pnpm run test:chrome
+         - name: Test on Firefox
+           run: pnpm run test:firefox
+         - name: Test on Chrome using custom container
+           run: pnpm run test:container:chrome
+         - name: Test on Firefox using custom container
+           run: pnpm run test:container:firefox

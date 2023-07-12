@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { onBeforeMount, ref } from 'vue'
+import { onBeforeMount, ref, type CSSProperties } from 'vue'
 import { useFixedHeader } from '../../src/useFixedHeader'
 
 const props = defineProps<{
    enterDelta?: number
    leaveDelta?: number
+   enterStyles?: CSSProperties
+   leaveStyles?: CSSProperties
    simulateScrollRestoration?: boolean
 }>()
 
@@ -25,6 +27,8 @@ useFixedHeader(headerRef, {
    root: containerRef,
    enterDelta: props.enterDelta,
    leaveDelta: props.leaveDelta,
+   enterStyles: props.enterStyles,
+   leaveStyles: props.leaveStyles,
 })
 </script>
 
