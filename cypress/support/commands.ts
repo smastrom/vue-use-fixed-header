@@ -1,12 +1,13 @@
 import 'cypress-wait-frames'
 
-import { IDLE_SCROLL_FRAME_COUNT } from '../../src/constants'
+import { DEFAULT_LEAVE_DELTA, IDLE_SCROLL_FRAME_COUNT } from '../../src/constants'
 
 declare global {
    namespace Cypress {
       interface Chainable {
          scrollWithDelta: (options: ScrollWithDeltaOptions) => void
          waitForIdleScroll: () => void
+         scrollToHide: () => void
       }
    }
 }
@@ -44,4 +45,9 @@ Cypress.Commands.add('waitForIdleScroll', () => {
    cy.waitFrames({ subject: cy.document, property: 'scrollTop', frames: IDLE_SCROLL_FRAME_COUNT })
 })
 
-export {}
+Cypress.Commands.add('scrollToHide', () => {
+   // Higher duration will scroll more
+   cy.scrollWithDelta({ delta: DEFAULT_LEAVE_DELTA, minDuration: 2000 })
+
+   cy.get('header').should('not.be.visible')
+})

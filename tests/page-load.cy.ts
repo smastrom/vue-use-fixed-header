@@ -2,7 +2,7 @@ import HeaderFixed from './components/HeaderFixed.vue'
 
 import { DEFAULT_ENTER_DELTA } from '../src/constants'
 
-describe('Page Load', () => {
+describe('Page load', () => {
    it('Header is visible at top of the page', () => {
       cy.mount(HeaderFixed).get('header').should('be.visible')
    })
@@ -17,7 +17,7 @@ describe('Page Load', () => {
       cy.get('header').should('not.be.visible')
    })
 
-   it('Header is visible after auto scroll (smooth-scroll on hash navigation)', () => {
+   it('Header is always visible after auto scroll (smooth-scroll on hash navigation)', () => {
       cy.mount(HeaderFixed)
 
       cy.scrollTo('center', { duration: 1000 })
