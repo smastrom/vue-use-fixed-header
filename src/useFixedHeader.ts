@@ -134,6 +134,8 @@ export function useFixedHeader(
                   captureLeaveDelta = false
 
                   captureDelta((value) => {
+                     console.log(value, mergedOptions.leaveDelta)
+
                      if (value >= mergedOptions.leaveDelta) {
                         isVisible.value = false
                      }

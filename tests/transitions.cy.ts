@@ -1,3 +1,4 @@
+import { customStyles } from '../cypress/support/constants'
 import { DEFAULT_ENTER_DELTA, defaultOptions } from '../src/constants'
 
 describe('Transitions', () => {
@@ -18,14 +19,35 @@ describe('Transitions', () => {
    })
 
    it('Transitions are toggled properly', () => {
-      cy.mountApp().waitForIdleScroll()
+      cy.mountApp()
+         .waitForIdleScroll()
+         .scrollToHide()
+         .get('header')
+         .should('be.hidden')
+         .checkStyles(defaultOptions.leaveStyles)
 
-      cy.scrollToHide()
+      cy.scrollRootWithDelta({ delta: DEFAULT_ENTER_DELTA, scrollDown: false })
+         .get('header')
+         .should('be.visible')
+         .checkStyles(defaultOptions.enterStyles)
+   })
 
-      cy.get('header').should('be.hidden').checkStyles(defaultOptions.leaveStyles)
+   it('Custom transitions are toggled properly', () => {
+      cy.mountApp({
+         props: {
+            enterStyles: customStyles.enter,
+            leaveStyles: customStyles.leave,
+         },
+      })
+         .waitForIdleScroll()
+         .scrollToHide()
+         .get('header')
+         .should('be.hidden')
+         .checkStyles(customStyles.leave)
 
-      cy.scrollWithDelta({ delta: DEFAULT_ENTER_DELTA, scrollDown: false })
-
-      cy.get('header').should('be.visible').checkStyles(defaultOptions.enterStyles)
+      cy.scrollRootWithDelta({ delta: DEFAULT_ENTER_DELTA, scrollDown: false })
+         .get('header')
+         .should('be.visible')
+         .checkStyles(customStyles.enter)
    })
 })

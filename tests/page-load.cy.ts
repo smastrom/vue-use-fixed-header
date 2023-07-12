@@ -11,16 +11,16 @@ describe('Page load', () => {
             simulateScrollRestoration: true,
          },
       })
-
-      cy.get('header').should('not.be.visible')
+         .get('header')
+         .should('not.be.visible')
    })
 
    it('Header is always visible after auto scroll (smooth-scroll on hash navigation)', () => {
       cy.mountApp()
-
-      cy.getScrollSubject().scrollTo('center', { duration: 1000 })
-
-      cy.get('header').should('be.visible')
+         .getScrollSubject()
+         .scrollTo('center', { duration: 1000 })
+         .get('header')
+         .should('be.visible')
    })
 
    it('Header is visible if scrolling up after scroll-restoration', () => {
@@ -30,12 +30,11 @@ describe('Page load', () => {
          },
       })
 
-      cy.get('header').should('not.be.visible')
-
-      cy.waitForIdleScroll()
-
-      cy.scrollWithDelta({ delta: DEFAULT_ENTER_DELTA, scrollDown: false })
-
-      cy.get('header').should('be.visible')
+         .get('header')
+         .should('not.be.visible')
+         .waitForIdleScroll()
+         .scrollRootWithDelta({ delta: DEFAULT_ENTER_DELTA, scrollDown: false })
+         .get('header')
+         .should('be.visible')
    })
 })

@@ -5,7 +5,7 @@ import { isCustomContainer } from './constants'
 
 import type { CSSProperties } from 'vue'
 
-type ScrollWithDeltaOptions = {
+type scrollRootWithDeltaOptions = {
    delta: number
    scrollDown?: boolean
    minDuration?: number
@@ -14,12 +14,10 @@ type ScrollWithDeltaOptions = {
 declare global {
    namespace Cypress {
       interface Chainable {
-         getScrollSubject: () =>
-            | Cypress.Chainable<JQuery<HTMLElement>>
-            | Cypress.Chainable<Cypress.AUTWindow>
-         scrollWithDelta: (options: ScrollWithDeltaOptions) => void
-         waitForIdleScroll: () => void
-         scrollToHide: () => void
+         getScrollSubject: () => Cypress.Chainable
+         scrollRootWithDelta: (options: scrollRootWithDeltaOptions) => Cypress.Chainable
+         waitForIdleScroll: () => Cypress.Chainable
+         scrollToHide: () => Cypress.Chainable
          checkStyles: (styles: CSSProperties) => void
       }
    }
@@ -31,8 +29,8 @@ Cypress.Commands.add('getScrollSubject', () => {
 })
 
 Cypress.Commands.add(
-   'scrollWithDelta',
-   ({ delta, scrollDown = true, minDuration = 1000 }: ScrollWithDeltaOptions) => {
+   'scrollRootWithDelta',
+   ({ delta, scrollDown = true, minDuration = 1000 }: scrollRootWithDeltaOptions) => {
       let distance = delta * minDuration
       let duration = minDuration
 
@@ -41,17 +39,15 @@ Cypress.Commands.add(
          const headerHeight = $header.height()
 
          if (headerHeight && distance < headerHeight) {
-            throw new Error(
-               `Scrolling distance (${distance}) is less than ${headerHeight}px. Increase second parameter (minDuration).`
-            )
+            throw new Error(`Scrolling distance is less than ${headerHeight}px. Increase duration.`)
          }
       })
 
       const scrollDistance = scrollDown ? distance : -1 * distance
 
-      cy.log(`Scrolling ${scrollDistance}px with ${delta} delta in ${duration}ms`)
+      cy.log(`Scrolling ${scrollDistance}px with a delta of ${delta} in ${duration}ms`)
 
-      cy.getScrollSubject().scrollTo(0, scrollDistance, { duration })
+      return cy.getScrollSubject().scrollTo(0, scrollDistance, { duration })
    }
 )
 
@@ -64,8 +60,8 @@ Cypress.Commands.add('waitForIdleScroll', () => {
 })
 
 Cypress.Commands.add('scrollToHide', () => {
-   cy.scrollWithDelta({ delta: DEFAULT_LEAVE_DELTA })
-   cy.get('header').should('not.be.visible')
+   cy.scrollRootWithDelta({ delta: DEFAULT_LEAVE_DELTA })
+   return cy.get('header').should('not.be.visible')
 })
 
 Cypress.Commands.add('checkStyles', { prevSubject: 'element' }, (subject, styles) => {
