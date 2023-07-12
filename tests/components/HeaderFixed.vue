@@ -1,13 +1,22 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onBeforeMount, ref } from 'vue'
 import { useFixedHeader } from '../../src/useFixedHeader'
 
 const props = defineProps<{
    enterDelta?: number
    leaveDelta?: number
+   simulateScrollRestoration?: boolean
 }>()
 
 const headerRef = ref<HTMLElement | null>(null)
+
+onBeforeMount(() => {
+   if (!props.simulateScrollRestoration) return
+
+   window.requestAnimationFrame(() => {
+      window.scroll(0, window.innerHeight / 3)
+   })
+})
 
 useFixedHeader(headerRef, props)
 </script>
