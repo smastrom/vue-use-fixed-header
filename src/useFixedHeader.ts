@@ -11,7 +11,9 @@ export function useFixedHeader(
 ) {
    const mergedOptions = mergeDefined(defaultOptions, options)
 
-   const isVisible = ref(false)
+   const isVisible = ref(true)
+
+   let isScrollIdle = false
 
    // Utils
 
@@ -122,7 +124,6 @@ export function useFixedHeader(
                   captureEnterDelta = false
 
                   captureDelta((value) => {
-                     console.log(mergedOptions.enterDelta, value)
                      if (value >= mergedOptions.enterDelta) {
                         isVisible.value = true
                      }
@@ -153,14 +154,20 @@ export function useFixedHeader(
       const el = unref(target)
       if (!el) return
 
-      if (getScrollTop() > getHeaderHeight(el) * 2) {
-         setStyles({ ...mergedOptions.leaveStyles, visibility: 'hidden' })
-      }
+      requestAnimationFrame(() => {
+         if (getScrollTop() > getHeaderHeight(el) * 1.2) {
+            isVisible.value = false
+            setStyles({ ...mergedOptions.leaveStyles, visibility: 'hidden' })
+         }
+      })
 
       onScrollIdle(() => {
          const root = getRoot()
          if (!root) return
 
+         console.log('Scroll is idle, injecting listener and attaching watcher')
+
+         isScrollIdle = true
          root.addEventListener('scroll', onScroll, { passive: true })
       })
    })
@@ -176,8 +183,10 @@ export function useFixedHeader(
 
    watch(
       isVisible,
-      (_isVisible) => {
-         if (_isVisible) {
+      (isEntering) => {
+         if (!isScrollIdle) return
+
+         if (isEntering) {
             setStyles({ ...mergedOptions.enterStyles, visibility: 'visible' })
          } else {
             setStyles(mergedOptions.leaveStyles)
