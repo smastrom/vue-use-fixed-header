@@ -1,20 +1,23 @@
+![npm](https://img.shields.io/npm/v/vue-use-fixed-header?color=46c119) ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/smastrom/vue-use-fixed-header/tests.yml?branch=main&label=tests)
+![dependency-count](https://img.shields.io/badge/dependency%20count-0-success)
+
 # Vue Use Fixed Header
 
-Turn your boring fixed header into a smart and beautiful one.
+Turn your boring fixed header into a smart animated one.
 
 <br />
 
-**Demo:** [Visit Website]() — **Examples:** [Nuxt 3]() - [Vue 3]()
+**Demo:** [Website](https://vue-use-fixed-header.netlify.app/) — **Examples:** [Vue 3]() - [Nuxt 3]()
 
 <br />
 
 ## Features
 
--  **Dead simple** - Few props and you're done
--  **Lightweight** - Less than 1kb without dependencies
+-  **Dead simple** - Call a function and you're done
+-  **Lightweight** - 1kb without dependencies
 -  **Smart** - When scrolling down, the header is hidden, when scrolling up, the header is shown
--  **Fine-grained** - Visibility behaves correctly on page load and on top reached
--  **Beautiful** - Beatiful transition are applied by default and can be customized
+-  **Fine-grained** - Behaves as your users expect on page load and on top reached
+-  **Beautiful** - Customizable transition applied by default
 -  **Customizable** - Touch the acceleration delta for both hiding and showing and use any scrolling container
 
 <br />
@@ -48,7 +51,7 @@ useFixedHeader(headerRef)
 </style>
 ```
 
-> Do not apply any transition to your header, it will be done automatically for you. See below how to customize them.
+> :warning: Do not apply any `transition` or `visibility` property to your header since it is already done for you.
 
 <br />
 
@@ -58,25 +61,25 @@ useFixedHeader(headerRef)
 const { isVisible } = useFixedHeader(headerRef, {
    /**
     * Keep null if content is scrolled by the window,
-    * otherwise pass a custom scrolling container ref */
+    * otherwise pass a custom scrolling container template ref */
    root: null,
    /**
     * Minimum acceleration delta required to show the header */
-   enterDelta: 0.5,
+   enterDelta: 0.5, // Default
    /**
     * Minimum acceleration delta required to hide the header */
-   leaveDelta: 0.25,
+   leaveDelta: 0.15, // Default
    /**
     * Custom entrance transition styles */
    enterStyles: {
-      transition: `transform 300ms ease-out`,
+      transition: `transform 0.3s ease-out`,
       transform: 'translateY(0px)',
       opacity: 1,
    },
    /**
     * Custom leave transition styles */
    leaveStyles: {
-      transition: `transform 600ms ease-out, opacity 600ms ease-out`,
+      transition: `transform 0.5s ease-out, opacity 0.5s ease-out`,
       transform: 'translateY(-100%)',
       opacity: 0,
    },
