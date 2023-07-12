@@ -4,10 +4,7 @@ import { useFixedHeader } from '../src/useFixedHeader'
 
 const headerRef = ref<HTMLElement | null>(null)
 
-useFixedHeader(headerRef, {
-   leaveDelta: 0.5,
-   enterDelta: 0.5,
-})
+useFixedHeader(headerRef)
 </script>
 
 <template>
@@ -63,7 +60,7 @@ useFixedHeader(headerRef, {
    width: 1280px;
    max-width: 100%;
    height: 80px;
-   margin: 2rem;
+   margin: 1rem;
    padding: 1rem;
    display: flex;
    align-items: center;

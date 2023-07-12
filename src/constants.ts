@@ -17,11 +17,9 @@ export const defaultOptions: UseFixedHeaderOptions = {
    enterStyles: {
       transition: `transform 0.3s ${easing} 0s`,
       transform: 'translateY(0px)',
-      opacity: 1,
    },
    leaveStyles: {
-      transition: `transform 0.6s ${easing} 0s, opacity 0.6s ${easing} 0s`,
+      transition: `transform 0.5s ${easing} 0s`,
       transform: 'translateY(-100%)',
-      opacity: 0,
    },
 }

@@ -9,24 +9,24 @@ const headerRef = ref<HTMLElement | null>(null)
 
 useFixedHeader(headerRef, {
    root: containerRef,
-   leaveDelta: 0.5,
-   enterDelta: 0.5,
 })
 </script>
 
 <template>
    <div class="Scroll_Container" ref="containerRef">
       <div class="Container">
-         <header class="Header" ref="headerRef">
-            <h2 class="Global_Logo">Vufh</h2>
+         <header class="Header_Wrapper" ref="headerRef">
+            <div class="Header_Container">
+               <h2 class="Global_Logo">Vufh</h2>
 
-            <a
-               target="_blank"
-               class="Header_Button"
-               href="https://github.com/smastrom/vue-use-fixed-header/blob/main/demo/Container.vue"
-            >
-               View Code
-            </a>
+               <a
+                  target="_blank"
+                  class="Header_Button"
+                  href="https://github.com/smastrom/vue-use-fixed-header/blob/main/demo/WithContainer.vue"
+               >
+                  View Code
+               </a>
+            </div>
          </header>
       </div>
    </div>
@@ -45,24 +45,27 @@ useFixedHeader(headerRef, {
 }
 
 .Container {
-   height: 1200px;
+   height: 1800px;
    position: relative;
    background-color: var(--WhiteColor);
 }
 
-.Header {
-   justify-content: space-between;
+.Header_Wrapper {
+   padding: 1rem;
    position: sticky;
-   top: 1rem;
+   top: 0;
+}
+
+.Header_Container {
+   justify-content: space-between;
    background-color: var(--AccentColor);
-   margin: 1rem;
    display: flex;
    align-items: center;
    padding: 1rem;
    border-radius: 1rem;
 }
 
-.Header .Global_Logo {
+.Header_Container .Global_Logo {
    color: var(--WhiteColor);
 }
 
