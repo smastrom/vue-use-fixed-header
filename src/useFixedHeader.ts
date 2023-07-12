@@ -167,8 +167,6 @@ export function useFixedHeader(
          const root = getRoot()
          if (!root) return
 
-         console.log('Scroll is idle, injecting listener and attaching watcher')
-
          isScrollIdle = true
          root.addEventListener('scroll', onScroll, { passive: true })
       })
