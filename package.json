@@ -46,7 +46,9 @@
       "build:demo": "vue-tsc && vite build --mode demo",
       "preview": "vite preview --mode demo",
       "test": "cypress run --component --browser chrome",
-      "test:gui": "cypress open --component --browser chrome"
+      "test:container": "cypress run --component --browser chrome --env CONTAINER=\"custom\"",
+      "test:gui": "cypress open --component --browser chrome",
+      "test:gui:container": "cypress open --component --browser chrome --env CONTAINER=\"custom\""
    },
    "devDependencies": {
       "@rollup/plugin-terser": "^0.4.3",

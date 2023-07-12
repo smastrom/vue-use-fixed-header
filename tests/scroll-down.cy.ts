@@ -1,11 +1,9 @@
-import HeaderFixed from './components/HeaderFixed.vue'
-
 import { DEFAULT_LEAVE_DELTA } from '../src/constants'
 
 describe('Scroll down', () => {
    describe('Header is hidden if scroll delta is equal or above hideDelta', () => {
       it('Same delta', () => {
-         cy.mount(HeaderFixed).waitForIdleScroll()
+         cy.mountApp().waitForIdleScroll()
 
          cy.scrollWithDelta({ delta: DEFAULT_LEAVE_DELTA })
 
@@ -13,7 +11,7 @@ describe('Scroll down', () => {
       })
 
       it('Greater delta', () => {
-         cy.mount(HeaderFixed).waitForIdleScroll()
+         cy.mountApp().waitForIdleScroll()
 
          cy.scrollWithDelta({ delta: DEFAULT_LEAVE_DELTA * 1.5 })
 
@@ -22,7 +20,7 @@ describe('Scroll down', () => {
    })
 
    it('Header is visible if scroll delta is below hideDelta', () => {
-      cy.mount(HeaderFixed).waitForIdleScroll()
+      cy.mountApp().waitForIdleScroll()
 
       cy.scrollWithDelta({ delta: DEFAULT_LEAVE_DELTA / 2 })
 

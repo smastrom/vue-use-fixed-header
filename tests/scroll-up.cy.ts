@@ -1,11 +1,9 @@
-import HeaderFixed from './components/HeaderFixed.vue'
-
 import { DEFAULT_ENTER_DELTA } from '../src/constants'
 
 describe('Scroll up', () => {
    describe('Header is visible if scroll delta is equal or above enterDelta', () => {
       it('Same delta', () => {
-         cy.mount(HeaderFixed).waitForIdleScroll()
+         cy.mountApp().waitForIdleScroll()
 
          cy.scrollToHide()
 
@@ -15,7 +13,7 @@ describe('Scroll up', () => {
       })
 
       it('Greater delta', () => {
-         cy.mount(HeaderFixed).waitForIdleScroll()
+         cy.mountApp().waitForIdleScroll()
 
          cy.scrollToHide()
 
@@ -26,7 +24,7 @@ describe('Scroll up', () => {
    })
 
    it('Header is hidden if scroll delta is below enterDelta', () => {
-      cy.mount(HeaderFixed).waitForIdleScroll()
+      cy.mountApp().waitForIdleScroll()
 
       cy.scrollToHide()
 

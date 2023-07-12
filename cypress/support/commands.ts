@@ -1,6 +1,7 @@
 import 'cypress-wait-frames'
 
-import { DEFAULT_LEAVE_DELTA, IDLE_SCROLL_FRAME_COUNT, defaultOptions } from '../../src/constants'
+import { DEFAULT_LEAVE_DELTA, IDLE_SCROLL_FRAME_COUNT } from '../../src/constants'
+import { isCustomContainer } from './constants'
 
 import type { CSSProperties } from 'vue'
 
@@ -13,6 +14,9 @@ type ScrollWithDeltaOptions = {
 declare global {
    namespace Cypress {
       interface Chainable {
+         getScrollSubject: () =>
+            | Cypress.Chainable<JQuery<HTMLElement>>
+            | Cypress.Chainable<Cypress.AUTWindow>
          scrollWithDelta: (options: ScrollWithDeltaOptions) => void
          waitForIdleScroll: () => void
          scrollToHide: () => void
@@ -20,6 +24,11 @@ declare global {
       }
    }
 }
+
+Cypress.Commands.add('getScrollSubject', () => {
+   if (isCustomContainer) return cy.get('.Scroller')
+   return cy.window()
+})
 
 Cypress.Commands.add(
    'scrollWithDelta',
@@ -38,19 +47,24 @@ Cypress.Commands.add(
          }
       })
 
-      cy.log(`Scrolling ${distance}px with ${delta} delta in ${duration}ms`)
+      const scrollDistance = scrollDown ? distance : -1 * distance
 
-      cy.scrollTo(0, scrollDown ? distance : -1 * distance, { duration })
+      cy.log(`Scrolling ${scrollDistance}px with ${delta} delta in ${duration}ms`)
+
+      cy.getScrollSubject().scrollTo(0, scrollDistance, { duration })
    }
 )
 
 Cypress.Commands.add('waitForIdleScroll', () => {
-   cy.waitFrames({ subject: cy.document, property: 'scrollTop', frames: IDLE_SCROLL_FRAME_COUNT })
+   cy.waitFrames({
+      subject: isCustomContainer ? () => cy.get('.Scroller') : (cy.document as any),
+      property: 'scrollTop',
+      frames: IDLE_SCROLL_FRAME_COUNT,
+   })
 })
 
 Cypress.Commands.add('scrollToHide', () => {
-   cy.scrollWithDelta({ delta: DEFAULT_LEAVE_DELTA, minDuration: 2000 })
-
+   cy.scrollWithDelta({ delta: DEFAULT_LEAVE_DELTA })
    cy.get('header').should('not.be.visible')
 })
 
