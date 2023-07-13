@@ -15,7 +15,7 @@ declare global {
          getScrollSubject: () => Cypress.Chainable
          scrollRootWithDelta: (options: scrollRootWithDeltaOptions) => Cypress.Chainable
          scrollToHide: () => Cypress.Chainable
-         checkStyles: (styles: CSSProperties) => void
+         checkStyles: (styles: CSSProperties) => Cypress.Chainable
          resizeRoot: (newWidth: number) => Cypress.Chainable
       }
    }

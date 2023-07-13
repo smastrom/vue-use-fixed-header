@@ -1,3 +1,4 @@
+import type { Ref } from 'vue'
 import type { UseFixedHeaderOptions } from './types'
 
 export const CAPTURE_DELTA_FRAME_COUNT = 10
@@ -23,5 +24,5 @@ export const defaultOptions: UseFixedHeaderOptions = {
       transition: `transform 0.5s ${easing} 0s`,
       transform: 'translateY(-101%)',
    },
-   watch: [],
+   watch: (() => null) as unknown as Ref<any>,
 }

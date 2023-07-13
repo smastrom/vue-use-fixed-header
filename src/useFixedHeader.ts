@@ -263,7 +263,7 @@ export function useFixedHeader(
       }
    })
 
-   watch(() => mergedOptions.watch, toggleFunctionalities, { flush: 'post' })
+   watch(mergedOptions.watch, toggleFunctionalities, { flush: 'post' })
 
    return { isVisible }
 }

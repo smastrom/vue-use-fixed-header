@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeMount, ref, type CSSProperties } from 'vue'
+import { onBeforeMount, ref, type Ref, type CSSProperties } from 'vue'
 import { useFixedHeader } from '../../src/useFixedHeader'
 
 const props = defineProps<{

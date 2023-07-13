@@ -8,5 +8,5 @@ export interface UseFixedHeaderOptions<T = any> {
    root: MaybeTemplateRef
    enterStyles: CSSProperties
    leaveStyles: CSSProperties
-   watch: (Ref<T> | ComputedRef<T> | null)[]
+   watch: Ref<T> | ComputedRef<T>
 }
