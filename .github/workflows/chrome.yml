@@ -1,10 +1,12 @@
-name: Tests
+name: Chrome
 
 on: [push]
 
 jobs:
-   cypress-run:
+   cypress-ct:
       runs-on: ubuntu-latest
+      env:
+         CYPRESS_RETRIES: 2
       steps:
          - uses: actions/checkout@v3
          - uses: actions/setup-node@v3
@@ -18,11 +20,7 @@ jobs:
               run_install: false
          - name: Install dependencies
            run: pnpm install
-         - name: Test on Chrome
+         - name: Window scroll
            run: pnpm run test:chrome
-         - name: Test on Firefox
-           run: pnpm run test:firefox
-         - name: Test on Chrome using custom container
+         - name: Custom scrolling container
            run: pnpm run test:container:chrome
-         - name: Test on Firefox using custom container
-           run: pnpm run test:container:firefox

@@ -63,6 +63,11 @@ Cypress.Commands.add('scrollToHide', () => cy.scrollRootWithDelta({ delta: DEFAU
 
 Cypress.Commands.add('checkStyles', { prevSubject: 'element' }, (subject, styles) => {
    Object.entries(styles).forEach(([property, value]) => {
+      // Webkit removes the 0s delay specified in our styles
+      if (Cypress.isBrowser('webkit') && property === 'transition') {
+         value = value.replaceAll(' 0s', '')
+      }
+
       cy.wrap(subject).should('have.attr', 'style').and('include', `${property}: ${value}`)
    })
 })

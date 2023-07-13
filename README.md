@@ -1,5 +1,4 @@
-![npm](https://img.shields.io/npm/v/vue-use-fixed-header?color=46c119) ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/smastrom/vue-use-fixed-header/tests.yml?branch=main&label=tests)
-![dependency-count](https://img.shields.io/badge/dependency%20count-0-success)
+![npm](https://img.shields.io/npm/v/vue-use-fixed-header?color=46c119) ![dependency-count](https://img.shields.io/badge/dependencies-0-success) ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/smastrom/vue-use-fixed-header/chrome.yml?branch=main&label=chrome) ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/smastrom/vue-use-fixed-header/safari.yml?branch=main&label=safari) ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/smastrom/vue-use-fixed-header/firefox.yml?branch=main&label=firefox)
 
 # Vue Use Fixed Header
 

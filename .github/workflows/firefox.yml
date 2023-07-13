@@ -1,0 +1,24 @@
+name: Firefox
+
+on: [push]
+
+jobs:
+   cypress-ct:
+      runs-on: ubuntu-latest
+      steps:
+         - uses: actions/checkout@v3
+         - uses: actions/setup-node@v3
+           with:
+              node-version: '18'
+         - uses: pnpm/action-setup@v2
+           name: Install pnpm
+           id: pnpm-install
+           with:
+              version: 8
+              run_install: false
+         - name: Install dependencies
+           run: pnpm install
+         - name: Window scroll
+           run: pnpm run test:firefox
+         - name: Custom scrolling container
+           run: pnpm run test:container:firefox
