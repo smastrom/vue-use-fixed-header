@@ -20,9 +20,6 @@ devDependencies:
   cypress:
     specifier: ^12.17.1
     version: 12.17.1
-  cypress-wait-frames:
-    specifier: ^0.9.4
-    version: 0.9.4
   rimraf:
     specifier: ^5.0.1
     version: 5.0.1
@@ -931,10 +928,6 @@ packages:
 
   /csstype@3.1.2:
     resolution: {integrity: sha512-I7K1Uu0MBPzaFKg4nI5Q7Vs2t+3gWWW648spaF+Rg7pI9ds18Ugn+lvg4SHczUdKlHI5LWBXyqfS8+DufyBsgQ==}
-    dev: true
-
-  /cypress-wait-frames@0.9.4:
-    resolution: {integrity: sha512-W3U9Ku+GSrhbHT0UxtfmUBm8KAoKXDCLFbcLtA8wHBTnMQgvGyBD/zK8huPu9sn+X+wcbtGP5QiucF8CjlkhBQ==}
     dev: true
 
   /cypress@12.17.1:

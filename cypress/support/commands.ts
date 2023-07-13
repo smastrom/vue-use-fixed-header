@@ -1,5 +1,3 @@
-import 'cypress-wait-frames'
-
 import { DEFAULT_LEAVE_DELTA } from '../../src/constants'
 import { isCustomContainer } from './constants'
 
@@ -16,7 +14,6 @@ declare global {
       interface Chainable {
          getScrollSubject: () => Cypress.Chainable
          scrollRootWithDelta: (options: scrollRootWithDeltaOptions) => Cypress.Chainable
-         waitForIdleScroll: () => Cypress.Chainable
          scrollToHide: () => Cypress.Chainable
          checkStyles: (styles: CSSProperties) => void
       }
@@ -50,14 +47,6 @@ Cypress.Commands.add(
       return cy.getScrollSubject().scrollTo(0, scrollDistance, { duration })
    }
 )
-
-Cypress.Commands.add('waitForIdleScroll', () => {
-   cy.waitFrames({
-      subject: isCustomContainer ? () => cy.get('.Scroller') : (cy.document as any),
-      property: 'scrollTop',
-      frames: 10,
-   })
-})
 
 Cypress.Commands.add('scrollToHide', () => {
    cy.scrollRootWithDelta({ delta: DEFAULT_LEAVE_DELTA })
