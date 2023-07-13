@@ -16,6 +16,7 @@ declare global {
          scrollRootWithDelta: (options: scrollRootWithDeltaOptions) => Cypress.Chainable
          scrollToHide: () => Cypress.Chainable
          checkStyles: (styles: CSSProperties) => void
+         resizeRoot: (newWidth: number) => Cypress.Chainable
       }
    }
 }
@@ -23,6 +24,16 @@ declare global {
 Cypress.Commands.add('getScrollSubject', () => {
    if (isCustomContainer) return cy.get('.Scroller')
    return cy.window()
+})
+
+Cypress.Commands.add('resizeRoot', (newWidth: number) => {
+   if (isCustomContainer) {
+      return cy.get('.Scroller').then(($el) => {
+         $el.css({ width: `${newWidth}px` })
+      })
+   }
+
+   return cy.viewport(newWidth, newWidth)
 })
 
 Cypress.Commands.add(
@@ -48,10 +59,7 @@ Cypress.Commands.add(
    }
 )
 
-Cypress.Commands.add('scrollToHide', () => {
-   cy.scrollRootWithDelta({ delta: DEFAULT_LEAVE_DELTA })
-   return cy.get('header').should('not.be.visible')
-})
+Cypress.Commands.add('scrollToHide', () => cy.scrollRootWithDelta({ delta: DEFAULT_LEAVE_DELTA }))
 
 Cypress.Commands.add('checkStyles', { prevSubject: 'element' }, (subject, styles) => {
    Object.entries(styles).forEach(([property, value]) => {

@@ -53,11 +53,14 @@ useFixedHeader(headerRef, {
 }
 
 .Scroller {
-   width: 500px;
-   height: 500px;
+   width: 600px;
+   height: 600px;
    overflow-y: scroll;
    overflow-x: hidden;
    background: white;
+   resize: horizontal;
+
+   container-type: inline-size;
 }
 
 .Container {
@@ -71,5 +74,18 @@ useFixedHeader(headerRef, {
    height: 80px;
    background: green;
    position: sticky;
+}
+
+/** Used in resize.cy.ts */
+@container (max-width: 475px) {
+   .Header {
+      position: relative;
+   }
+}
+
+@container (max-width: 320px) {
+   .Header {
+      display: none;
+   }
 }
 </style>

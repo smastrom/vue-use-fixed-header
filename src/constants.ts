@@ -23,5 +23,5 @@ export const defaultOptions: UseFixedHeaderOptions = {
       transition: `transform 0.5s ${easing} 0s`,
       transform: 'translateY(-101%)',
    },
-   watch: [null],
+   watch: [],
 }

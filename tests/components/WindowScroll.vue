@@ -47,4 +47,17 @@ useFixedHeader(headerRef, {
    background: red;
    position: fixed;
 }
+
+/** Used in resize.cy.ts */
+@media (max-width: 768px) {
+   .Header {
+      position: relative;
+   }
+}
+
+@media (max-width: 375px) {
+   .Header {
+      display: none;
+   }
+}
 </style>

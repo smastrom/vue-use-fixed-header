@@ -12,3 +12,6 @@ export const customStyles = {
       opacity: 0.2,
    },
 }
+
+export const VIEWPORT_HEADER_RELATIVE = isCustomContainer ? 475 : 768
+export const VIEWPORT_HEADER_HIDDEN = isCustomContainer ? 320 : 375
