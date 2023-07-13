@@ -7,14 +7,14 @@ const props = defineProps<{
    leaveDelta?: number
    enterStyles?: CSSProperties
    leaveStyles?: CSSProperties
-   simulateScrollRestoration?: boolean
+   simulateInstantRestoration?: boolean
 }>()
 
 const containerRef = ref<HTMLElement | null>(null)
 const headerRef = ref<HTMLElement | null>(null)
 
 onBeforeMount(() => {
-   if (!props.simulateScrollRestoration) return
+   if (!props.simulateInstantRestoration) return
 
    window.requestAnimationFrame(() => {
       if (!containerRef.value) throw new Error('containerRef is null')

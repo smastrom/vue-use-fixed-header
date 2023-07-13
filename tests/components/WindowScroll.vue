@@ -7,13 +7,13 @@ const props = defineProps<{
    leaveDelta?: number
    enterStyles?: CSSProperties
    leaveStyles?: CSSProperties
-   simulateScrollRestoration?: boolean
+   simulateInstantRestoration?: boolean
 }>()
 
 const headerRef = ref<HTMLElement | null>(null)
 
 onBeforeMount(() => {
-   if (!props.simulateScrollRestoration) return
+   if (!props.simulateInstantRestoration) return
 
    window.requestAnimationFrame(() => {
       window.scroll(0, window.innerHeight / 3)

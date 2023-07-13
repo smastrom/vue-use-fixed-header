@@ -10,7 +10,7 @@ describe('Transitions', () => {
       it('Styles are applied if header is hidden (in order to trigger futher enter transition)', () => {
          cy.mountApp({
             props: {
-               simulateScrollRestoration: true,
+               simulateInstantRestoration: true,
             },
          })
 
@@ -20,7 +20,6 @@ describe('Transitions', () => {
 
    it('Transitions are toggled properly', () => {
       cy.mountApp()
-         .waitForIdleScroll()
          .scrollToHide()
          .get('header')
          .should('be.hidden')
@@ -39,7 +38,6 @@ describe('Transitions', () => {
             leaveStyles: customStyles.leave,
          },
       })
-         .waitForIdleScroll()
          .scrollToHide()
          .get('header')
          .should('be.hidden')

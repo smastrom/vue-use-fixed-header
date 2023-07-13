@@ -17,7 +17,6 @@ function testScrollUp({ delta, isCustom } = { delta: DEFAULT_ENTER_DELTA, isCust
 
    it('Header is hidden if scroll delta is lower than enterDelta', () => {
       cy.mountApp(props)
-         .waitForIdleScroll()
          .scrollToHide()
          .scrollRootWithDelta({ delta: delta / 2 })
          .get('header')
@@ -27,7 +26,6 @@ function testScrollUp({ delta, isCustom } = { delta: DEFAULT_ENTER_DELTA, isCust
    describe('Header is visible if scroll delta is equal or above enterDelta', () => {
       it('Same delta', () => {
          cy.mountApp(props)
-            .waitForIdleScroll()
             .scrollToHide()
             .scrollRootWithDelta({ delta, scrollDown: false })
             .get('header')
@@ -36,7 +34,6 @@ function testScrollUp({ delta, isCustom } = { delta: DEFAULT_ENTER_DELTA, isCust
 
       it('Greater delta', () => {
          cy.mountApp(props)
-            .waitForIdleScroll()
             .scrollToHide()
             .scrollRootWithDelta({ delta: delta * 15, scrollDown: false })
             .get('header')
