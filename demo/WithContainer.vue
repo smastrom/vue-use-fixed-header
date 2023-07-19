@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useFixedHeader } from '../src/useFixedHeader'
+import { useFixedHeader } from '../src'
 
 import Header from './Header.vue'
 

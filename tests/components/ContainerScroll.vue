@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onBeforeMount, ref, type CSSProperties } from 'vue'
-import { useFixedHeader } from '../../src/useFixedHeader'
+import { useFixedHeader } from '../../src'
 
 const props = defineProps<{
    enterDelta?: number

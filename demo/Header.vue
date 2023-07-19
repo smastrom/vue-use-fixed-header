@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useFixedHeader } from '../src/useFixedHeader'
+import { useFixedHeader } from '../src'
 
 const headerRef = ref<HTMLElement | null>(null)
 

@@ -10,7 +10,7 @@ export default defineConfig(({ mode }) => {
    return {
       build: {
          lib: {
-            entry: 'src/useFixedHeader.ts',
+            entry: 'src/index.ts',
             name: 'vue-use-fixed-header',
             fileName: 'index',
             formats: ['es', 'cjs'],

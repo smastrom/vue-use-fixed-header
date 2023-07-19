@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, unref, computed, type Ref } from 'vue'
-import { useFixedHeader } from '../../src/useFixedHeader'
+import { useFixedHeader } from '../../src'
 
 const props = defineProps<{
    watch: Ref<boolean>
