@@ -2,7 +2,7 @@
 
 # Vue Use Fixed Header
 
-Turn your boring fixed header into a smart one.
+Turn your boring fixed header into a smart one with one line of code.
 
 <br />
 
@@ -53,7 +53,7 @@ useFixedHeader(headerRef)
 <style scoped>
 .Header {
    position: fixed; /* or sticky */
-   top: 0; /* or whatever */
+   top: 0;
    /* Other styles... */
 }
 </style>
@@ -69,7 +69,9 @@ useFixedHeader(headerRef)
 
 ### Different viewports
 
-If at different viewports your header is not fixed/sticky anymore (or it is hidden), functionalities are automatically disabled and enabled again if needed.
+If at different viewports your header is not fixed/sticky anymore (or it is hidden), functionalities are automatically disabled and enabled again when needed.
+
+Disabling functionalities means that the header will behave as you're not using `useFixedHeader` at all.
 
 So feel free to have code like this:
 
@@ -93,7 +95,7 @@ It will just work.
 
 Let's say your header in some pages is not supposed to be fixed/sticky and you're using some reactive logic to change its styles.
 
-You can use the `watch` property of `useFixedHeader` to tell the composable to perform a check everytime that value changes and it will automatically toggle functionalities if necessary.
+You can pass a reactive source to the `watch` property of `useFixedHeader` to perform a check everytime the value changes:
 
 ```vue
 <script setup>
@@ -115,40 +117,40 @@ useFixedHeader(headerRef, {
 </template>
 ```
 
-You can pass either a `ref` or a `computed` (without `.value`).
+`useFixedHeader` will automatically toggle functionalities when needed.
+
+> You can pass either a `ref` or a `computed` (without `.value`).
 
 <br />
 
 ## Customization
 
 ```ts
-const isVisible = useFixedHeader(headerRef, {
+useFixedHeader(headerRef, {
    /**
     * Use `null` if content is scrolled by the window,
     * otherwise pass a custom scrolling container template ref */
-   root: null, // Default
+   root: null,
    /**
     * ref or computed to watch for automatic behavior toggling */
-   watch: () => null, // Default
+   watch: () => null,
    /**
     * Minimum acceleration delta required to show the header */
-   enterDelta: 0.5, // Default
+   enterDelta: 0.5,
    /**
     * Minimum acceleration delta required to hide the header */
-   leaveDelta: 0.15, // Default
+   leaveDelta: 0.15,
    /**
     * Custom enter transition styles */
    enterStyles: {
       transition: `transform 0.3s ease-out`,
       transform: 'translateY(0px)',
-      opacity: 1,
    },
    /**
     * Custom leave transition styles */
    leaveStyles: {
-      transition: `transform 0.5s ease-out, opacity 0.5s ease-out`,
+      transition: `transform 0.5s ease-out`,
       transform: 'translateY(-100%)',
-      opacity: 0,
    },
 })
 ```

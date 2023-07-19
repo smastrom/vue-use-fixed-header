@@ -39,7 +39,7 @@ useFixedHeader(headerRef, {
 <style scoped>
 .Scroll_Container {
    height: 700px;
-   max-width: 100%;
+   max-width: calc(100% - 4rem);
    width: 600px;
    margin: auto;
    overflow: auto;
@@ -96,9 +96,10 @@ useFixedHeader(headerRef, {
    top: 40%;
    justify-content: center;
    align-items: center;
-   color: #494949;
+   color: var(--TextColor);
    display: flex;
    flex-direction: column;
    padding: 1rem;
+   text-align: center;
 }
 </style>

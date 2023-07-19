@@ -5,16 +5,11 @@ import { useFixedHeader } from '../src'
 const headerRef = ref<HTMLElement | null>(null)
 
 useFixedHeader(headerRef)
-
-const showHeader = ref(true)
 </script>
 
 <template>
    <div>
-      <button @click="showHeader = !showHeader" style="margin-top: 300px">
-         {{ showHeader ? 'Hide' : 'Show' }} Header
-      </button>
-      <header class="Header" ref="headerRef" v-if="showHeader">
+      <header class="Header" ref="headerRef">
          <div class="Nav">
             <h2 class="Global_Logo">Vufh</h2>
             <ul class="Nav_List">
