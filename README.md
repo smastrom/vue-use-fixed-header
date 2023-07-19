@@ -13,7 +13,7 @@ Turn your boring fixed header into a smart one.
 ## Features
 
 -  **Dead simple** - Call a function and you're done whether you're SSR'ing or not
--  **Lightweight** - 1kb circa without dependencies
+-  **Lightweight** - Just over 1kb without dependencies
 -  **Powerful** - Uses acceleration delta for both hiding and showing instead of fixed thresholds
 -  **Enjoyable** - When scrolling down, the header is hidden, when scrolling up, the header is shown.
 -  **User-centric** - Behaves as your users expect on page load, different styles of scroll restoration and on top reached

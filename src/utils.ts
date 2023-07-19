@@ -9,3 +9,5 @@ export function mergeDefined<T>(defaults: Required<T>, options: T): Required<T> 
 
    return result as Required<T>
 }
+
+export const isSSR = typeof window === 'undefined'

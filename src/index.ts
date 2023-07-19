@@ -1,6 +1,6 @@
 import { ref, onBeforeUnmount, unref, watch, type CSSProperties } from 'vue'
 
-import { mergeDefined } from './utils'
+import { mergeDefined, isSSR } from './utils'
 import {
    CAPTURE_DELTA_FRAME_COUNT,
    VISIBILITY_VISIBLE,
@@ -23,7 +23,7 @@ export function useFixedHeader(
    // Utils
 
    function getRoot() {
-      if (typeof window === 'undefined') return null
+      if (isSSR) return null
       const root = unref(mergedOptions.root)
       if (root != null) return root
 
@@ -229,6 +229,8 @@ export function useFixedHeader(
    watch(
       () => [unref(target), unref(mergedOptions.root)],
       (_target, _, onCleanup) => {
+         if (isSSR) return
+
          onCleanup(resetListeners)
 
          if (_target) {

@@ -27,13 +27,19 @@ export default defineConfig(({ mode }) => {
                   compress: {
                      drop_console: true,
                      defaults: true,
-                     passes: 4,
-                     ecma: 2020,
                   },
                }),
             ],
          },
       },
-      plugins: [dts({ staticImport: true, insertTypesEntry: true }), vue()],
+      plugins: [
+         dts({
+            include: ['src'],
+            staticImport: true,
+            insertTypesEntry: true,
+            rollupTypes: true,
+         }),
+         vue(),
+      ],
    }
 })
