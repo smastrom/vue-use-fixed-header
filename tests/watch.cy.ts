@@ -2,7 +2,7 @@ import App from './components/Watch.vue'
 
 import { ref } from 'vue'
 
-import { DEFAULT_ENTER_DELTA, defaultOptions } from '../src/constants'
+import { defaultOptions } from '../src/constants'
 
 describe('Watch', () => {
    if (!Cypress.env('CONTAINER')) {
@@ -20,7 +20,7 @@ describe('Watch', () => {
             .and('be.eq', 'position: relative;')
 
             .then(() => (isRelative.value = false))
-            .scrollRootWithDelta({ delta: DEFAULT_ENTER_DELTA, scrollDown: false })
+            .scrollToShow()
             .get('header')
             .checkStyles(defaultOptions.enterStyles)
 

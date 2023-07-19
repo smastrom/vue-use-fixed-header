@@ -1,4 +1,4 @@
-import { DEFAULT_LEAVE_DELTA } from '../../src/constants'
+import { DEFAULT_LEAVE_DELTA, DEFAULT_ENTER_DELTA } from '../../src/constants'
 import { isCustomContainer } from './constants'
 
 import type { CSSProperties } from 'vue'
@@ -15,6 +15,7 @@ declare global {
          getScrollSubject: () => Cypress.Chainable
          scrollRootWithDelta: (options: scrollRootWithDeltaOptions) => Cypress.Chainable
          scrollToHide: () => Cypress.Chainable
+         scrollToShow: () => Cypress.Chainable
          checkStyles: (styles: CSSProperties) => Cypress.Chainable
          resizeRoot: (newWidth: number) => Cypress.Chainable
       }
@@ -60,6 +61,10 @@ Cypress.Commands.add(
 )
 
 Cypress.Commands.add('scrollToHide', () => cy.scrollRootWithDelta({ delta: DEFAULT_LEAVE_DELTA }))
+
+Cypress.Commands.add('scrollToShow', () =>
+   cy.scrollRootWithDelta({ delta: DEFAULT_ENTER_DELTA, scrollDown: false })
+)
 
 Cypress.Commands.add('checkStyles', { prevSubject: 'element' }, (subject, styles) => {
    Object.entries(styles).forEach(([property, value]) => {

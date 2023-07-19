@@ -32,17 +32,11 @@ describe('Page load', () => {
 
    describe('Header is visible if scrolling up after scroll-restoration', () => {
       it('Instant scroll', () => {
-         testIstantRestoration()
-            .scrollRootWithDelta({ delta: DEFAULT_ENTER_DELTA, scrollDown: false })
-            .get('header')
-            .should('be.visible')
+         testIstantRestoration().scrollToShow().get('header').should('be.visible')
       })
 
       it('Smooth scroll', () => {
-         testSmoothRestoration()
-            .scrollRootWithDelta({ delta: DEFAULT_ENTER_DELTA, scrollDown: false })
-            .get('header')
-            .should('be.visible')
+         testSmoothRestoration().scrollToShow().get('header').should('be.visible')
       })
    })
 })

@@ -1,5 +1,5 @@
 import { customStyles } from '../cypress/support/constants'
-import { DEFAULT_ENTER_DELTA, defaultOptions } from '../src/constants'
+import { defaultOptions } from '../src/constants'
 
 describe('Transitions', () => {
    describe('Page load', () => {
@@ -25,10 +25,7 @@ describe('Transitions', () => {
          .should('be.hidden')
          .checkStyles(defaultOptions.leaveStyles)
 
-      cy.scrollRootWithDelta({ delta: DEFAULT_ENTER_DELTA, scrollDown: false })
-         .get('header')
-         .should('be.visible')
-         .checkStyles(defaultOptions.enterStyles)
+      cy.scrollToShow().get('header').should('be.visible').checkStyles(defaultOptions.enterStyles)
    })
 
    it('Custom transitions are toggled properly', () => {
@@ -43,9 +40,6 @@ describe('Transitions', () => {
          .should('be.hidden')
          .checkStyles(customStyles.leave)
 
-      cy.scrollRootWithDelta({ delta: DEFAULT_ENTER_DELTA, scrollDown: false })
-         .get('header')
-         .should('be.visible')
-         .checkStyles(customStyles.enter)
+      cy.scrollToShow().get('header').should('be.visible').checkStyles(customStyles.enter)
    })
 })
