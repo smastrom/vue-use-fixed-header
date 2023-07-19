@@ -59,26 +59,26 @@ export function useFixedHeader(
    }
 
    function removeStyles() {
-      const el = unref(target)
-      if (el) {
-         const properties = [
-            ...Object.keys({
-               ...mergedOptions.enterStyles,
-               ...mergedOptions.leaveStyles,
-            }),
-            'visibility',
-         ]
+      const properties = [
+         ...Object.keys({
+            ...mergedOptions.enterStyles,
+            ...mergedOptions.leaveStyles,
+         }),
+         'visibility',
+      ]
 
-         properties.forEach((prop) => el.style.removeProperty(prop))
-      }
+      properties.forEach((prop) => unref(target)?.style.removeProperty(prop))
    }
 
    /**
-    * Hides the header on page load/scroll restoration before it
-    * has a chance to paint, only if scroll is instant.
+    * Hides the header on page load before it has a chance to paint,
+    * only if scroll restoration is instant.
     *
     * If not instant (smooth-scroll) 'isBelowHeader' will resolve
-    * to false and the header will be visible until scroll is triggered.
+    * to false and the header will be visible until next scroll.
+    *
+    * Only in this case, visibility is set to 'hidden' because we don't
+    * want any transition to be visible.
     */
    function onInstantScrollRestoration() {
       if (!isInstantRestoration) return
@@ -92,6 +92,15 @@ export function useFixedHeader(
       isInstantRestoration = false
    }
 
+   /**
+    * Then once the scroll listener kicks-in, CSS visibility
+    * is never toggled and aria-hidden is used instead.
+    *
+    * Not using CSS visibility avoids some strange flickerings on Safari
+    * when overscrolling a custom container and the header is set
+    * to 'sticky'.
+    */
+
    function setAriaHidden() {
       unref(target)?.setAttribute('aria-hidden', 'true')
    }
@@ -100,14 +109,9 @@ export function useFixedHeader(
       unref(target)?.removeAttribute('aria-hidden')
    }
 
-   function removeVisibility() {
-      unref(target)?.style.removeProperty('visibility')
-   }
-
    function onVisible() {
       removeAriaHidden()
-      removeVisibility()
-      setStyles({ ...mergedOptions.enterStyles })
+      setStyles({ ...mergedOptions.enterStyles, visibility: '' as CSSProperties['visibility'] })
    }
 
    function onHidden() {
@@ -192,15 +196,15 @@ export function useFixedHeader(
          if (!isValid) {
             removeAriaHidden()
             removeStyles()
-            toggleScollListener(true)
+            toggleScrollListener(true)
          }
          // If was not listening and now is fixed or sticky
       } else {
-         if (isValid) toggleScollListener()
+         if (isValid) toggleScrollListener()
       }
    }
 
-   function toggleScollListener(isRemove = false) {
+   function toggleScrollListener(isRemove = false) {
       const root = getRoot()
       if (!root) return
 
@@ -225,12 +229,18 @@ export function useFixedHeader(
    }
 
    function resetListeners() {
-      toggleScollListener(true)
+      toggleScrollListener(true)
       resizeObserver?.disconnect()
    }
 
    // Watchers
 
+   /**
+    * Using this instead of 'onMounted' allows to toggle resize
+    * observer and scroll listener also in case the header is
+    * somehow removed from the DOM and the parent component that
+    * calls `useFixedHeader` is not unmounted.
+    */
    watch(
       () => [unref(target), unref(mergedOptions.root)],
       (targetEl, _, onCleanup) => {
@@ -240,7 +250,7 @@ export function useFixedHeader(
             /**
              * Resize listener is added in any case as it is
              * in charge of toggling the scroll listener if the header
-             * turns from fixed/sticky to something else and viceversa.
+             * turns from fixed/sticky to something else and vice-versa.
              */
             addResizeObserver()
             if (!isFixed()) return

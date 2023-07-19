@@ -59,7 +59,7 @@ useFixedHeader(headerRef)
 </style>
 ```
 
-:warning: There's only **one rule** to respect: Do not apply any _visibility_ or _transition-related_ property since it's handled for you.
+:warning: There's only **one rule** to respect: Do not apply any _visibility_ or _transition-related_ property since they're handled internally for you.
 
 > See [below](#customization) how to customize transitions.
 
