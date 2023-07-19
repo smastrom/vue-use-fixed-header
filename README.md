@@ -2,7 +2,7 @@
 
 # Vue Use Fixed Header
 
-Turn your boring fixed header into a smart animated one.
+Turn your boring fixed header into a smart one.
 
 <br />
 
@@ -13,7 +13,7 @@ Turn your boring fixed header into a smart animated one.
 ## Features
 
 -  **Dead simple** - Call a function and you're done whether you're SSR'ing or not
--  **Lightweight** - 1kb without any dependency
+-  **Lightweight** - 1kb circa without dependencies
 -  **Powerful** - Uses acceleration delta for both hiding and showing instead of fixed thresholds
 -  **Enjoyable** - When scrolling down, the header is hidden, when scrolling up, the header is shown.
 -  **User-centric** - Behaves as your users expect on page load, different styles of scroll restoration and on top reached
@@ -32,7 +32,7 @@ pnpm add vue-use-fixed-header
 
 ## Usage
 
-Pass your header's template ref to `useFixedHeader`. Then style your header as you would normally do. That's it.
+Pass your header's template ref to `useFixedHeader`. Then style it as you normally would. That's it.
 
 ```vue
 <script setup>
@@ -59,7 +59,9 @@ useFixedHeader(headerRef)
 </style>
 ```
 
-:warning: There's only **one rule** to respect: Do not manually apply the `visibility` property since it's handled internally for you.
+:warning: There's only **one rule** to respect: Do not apply any _visibility_ or _transition-related_ property since it's handled for you.
+
+> See [below](#customization) how to customize transitions.
 
 <br />
 
@@ -67,7 +69,7 @@ useFixedHeader(headerRef)
 
 ### Different viewports
 
-If at different viewports, your header is not fixed/sticky anymore or it is hidden, functionalities are automatically disabled and enabled again when needed.
+If at different viewports your header is not fixed/sticky anymore (or it is hidden), functionalities are automatically disabled and enabled again if needed.
 
 So feel free to have code like this:
 
@@ -89,9 +91,9 @@ It will just work.
 
 ### Advanced scenarios
 
-Let's say for example your header in some pages is not supposed to be fixed/sticky and you're using some reactive logic to change its styles.
+Let's say your header in some pages is not supposed to be fixed/sticky and you're using some reactive logic to change its styles.
 
-You can use the `watch` property of `useFixedHeader` to tell the composable to perform a check everytime that value changes and it will automatically toggle functionalities if needed.
+You can use the `watch` property of `useFixedHeader` to tell the composable to perform a check everytime that value changes and it will automatically toggle functionalities if necessary.
 
 ```vue
 <script setup>
@@ -102,7 +104,7 @@ const headerRef = ref(null)
 const isPricingPage = computed(() => route.name === 'Pricing')
 
 useFixedHeader(headerRef, {
-   watch: [isPricingPage], // Will perform a check everytime this value changes (route changes)
+   watch: isPricingPage, // Will perform a check everytime the value changes
 })
 </script>
 
@@ -113,21 +115,21 @@ useFixedHeader(headerRef, {
 </template>
 ```
 
-You can pass as many values as you want to `watch` (note the array syntax).
+You can pass either a `ref` or a `computed` (without `.value`).
 
 <br />
 
 ## Customization
 
 ```ts
-const { isVisible } = useFixedHeader(headerRef, {
+const isVisible = useFixedHeader(headerRef, {
    /**
-    * Keep null if content is scrolled by the window,
+    * Use `null` if content is scrolled by the window,
     * otherwise pass a custom scrolling container template ref */
-   root: null,
+   root: null, // Default
    /**
-    * ref or computed values to watch for automatic behavior toggling */
-   watch: [], // Default
+    * ref or computed to watch for automatic behavior toggling */
+   watch: () => null, // Default
    /**
     * Minimum acceleration delta required to show the header */
    enterDelta: 0.5, // Default

@@ -20,6 +20,7 @@ useFixedHeader(headerRef, {
                <h2 class="Global_Logo">Vufh</h2>
 
                <a
+                  target="_blank"
                   class="Header_Button"
                   href="https://github.com/smastrom/vue-use-fixed-header/blob/main/demo/WithContainer.vue"
                >
@@ -27,6 +28,10 @@ useFixedHeader(headerRef, {
                </a>
             </div>
          </header>
+         <div class="Content">
+            <h2>Custom Scroll Container</h2>
+            <p>Scroll this container to hide/show the header.</p>
+         </div>
       </div>
    </div>
 </template>
@@ -83,5 +88,17 @@ useFixedHeader(headerRef, {
       color: var(--WhiteColor);
       background-color: var(--AccentColor);
    }
+}
+
+.Content {
+   position: sticky;
+   margin: auto;
+   top: 40%;
+   justify-content: center;
+   align-items: center;
+   color: #494949;
+   display: flex;
+   flex-direction: column;
+   padding: 1rem;
 }
 </style>

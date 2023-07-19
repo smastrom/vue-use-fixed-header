@@ -24,8 +24,11 @@ useFixedHeader(headerRef)
                   >
                </li>
                <li class="Nav_List_Hidden">
-                  <a target="_blank" href="https://github.com/smastrom/vue-use-fixed-header">
-                     Live Examples
+                  <a
+                     target="_blank"
+                     href="https://stackblitz.com/@smastrom/collections/vue-use-fixed-header"
+                  >
+                     Examples
                   </a>
                </li>
                <li>
