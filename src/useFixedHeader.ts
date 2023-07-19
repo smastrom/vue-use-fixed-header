@@ -1,4 +1,4 @@
-import { ref, onMounted, onBeforeUnmount, unref, watch, type CSSProperties } from 'vue'
+import { ref, onBeforeUnmount, unref, watch, type CSSProperties } from 'vue'
 
 import { mergeDefined } from './utils'
 import {
@@ -81,7 +81,7 @@ export function useFixedHeader(
     * has a chance to paint, only if scroll is instant.
     *
     * If not instant (smooth-scroll) 'isBelowHeader' will resolve
-    * to false and the header will be visible until the user scrolls again.
+    * to false and the header will be visible until scroll is triggered.
     */
    function onInstantScrollRestoration() {
       requestAnimationFrame(() => {
@@ -218,52 +218,56 @@ export function useFixedHeader(
       if (root) resizeObserver.observe(root)
    }
 
-   // Lifecycle
-
-   onMounted(() => {
-      /**
-       * Resize listener is added in any case as is in charge
-       * of toggling the scroll listener if the header
-       * turns from fixed/sticky to something else.
-       */
-
-      addResizeObserver()
-
-      if (!isFixed()) return
-
-      /**
-       * Immediately hides the header on page load, this has no effect if
-       * scroll restoration is smooth (nuxt default behavior)
-       */
-      onInstantScrollRestoration()
-
-      /**
-       * This will hide the header in case of smooth-scroll restoration
-       */
-      toggleScollListener()
-   })
-
-   onBeforeUnmount(() => {
+   function resetListeners() {
       toggleScollListener(true)
       resizeObserver?.disconnect()
-   })
+      isVisible.value = true
+   }
 
    // Watchers
 
-   /**
-    * Updates styles once scroll listener is up and running
-    */
-   watch(isVisible, (isEntering) => {
+   watch(
+      () => [unref(target), unref(mergedOptions.root)],
+      (_target, _, onCleanup) => {
+         onCleanup(resetListeners)
+
+         if (_target) {
+            /**
+             * Resize listener is added in any case as is in charge
+             * of toggling the scroll listener if the header
+             * turns from fixed/sticky to something else.
+             */
+
+            addResizeObserver()
+
+            if (!isFixed()) return
+
+            /**
+             * Immediately hides the header on page load, this has no effect if
+             * scroll restoration is smooth (nuxt default behavior)
+             */
+            onInstantScrollRestoration()
+
+            // This hides the header in case of smooth-scroll restoration
+            toggleScollListener()
+         }
+      },
+      { immediate: true, flush: 'post' }
+   )
+
+   // Updates styles once scroll listener is up and running
+   watch(isVisible, (_isVisible) => {
       if (!isListeningScroll) return
 
-      if (isEntering) {
-         onVisible()
-      } else {
-         onHidden()
-      }
+      if (_isVisible) onVisible()
+      else onHidden()
    })
 
    watch(mergedOptions.watch, toggleFunctionalities, { flush: 'post' })
 
-   return { isVisible }
+   // Lifecycle
+
+   onBeforeUnmount(resetListeners)
+
+   return isVisible
 }
