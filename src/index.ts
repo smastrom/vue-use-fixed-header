@@ -1,12 +1,7 @@
-import { ref, onBeforeUnmount, unref, watch, type CSSProperties } from 'vue'
+import { onBeforeUnmount, unref, watch, type CSSProperties } from 'vue'
 
 import { mergeDefined, isSSR } from './utils'
-import {
-   CAPTURE_DELTA_FRAME_COUNT,
-   VISIBILITY_VISIBLE,
-   VISIBILITY_HIDDEN,
-   defaultOptions,
-} from './constants'
+import { CAPTURE_DELTA_FRAME_COUNT, defaultOptions } from './constants'
 
 import type { UseFixedHeaderOptions, MaybeTemplateRef } from './types'
 
@@ -16,14 +11,15 @@ export function useFixedHeader(
 ) {
    const mergedOptions = mergeDefined(defaultOptions, options)
 
-   const isVisible = ref(true)
-
+   let resizeObserver: ResizeObserver | undefined = undefined
    let isListeningScroll = false
+   let isInstantRestoration = true
 
    // Utils
 
    function getRoot() {
       if (isSSR) return null
+
       const root = unref(mergedOptions.root)
       if (root != null) return root
 
@@ -34,7 +30,7 @@ export function useFixedHeader(
       const root = getRoot()
       if (!root) return 0
 
-      return (root as HTMLElement).scrollTop
+      return root.scrollTop
    }
 
    function isFixed() {
@@ -59,18 +55,19 @@ export function useFixedHeader(
 
    function setStyles(styles: CSSProperties) {
       const el = unref(target)
-      if (el) {
-         Object.assign(el.style, styles)
-      }
+      if (el) Object.assign(el.style, styles)
    }
 
    function removeStyles() {
       const el = unref(target)
       if (el) {
-         const properties = Object.keys({
-            ...mergedOptions.enterStyles,
-            ...mergedOptions.leaveStyles,
-         }).concat('visibility')
+         const properties = [
+            ...Object.keys({
+               ...mergedOptions.enterStyles,
+               ...mergedOptions.leaveStyles,
+            }),
+            'visibility',
+         ]
 
          properties.forEach((prop) => el.style.removeProperty(prop))
       }
@@ -84,29 +81,38 @@ export function useFixedHeader(
     * to false and the header will be visible until scroll is triggered.
     */
    function onInstantScrollRestoration() {
+      if (!isInstantRestoration) return
+
       requestAnimationFrame(() => {
          const isBelowHeader = getScrollTop() > getHeaderHeight() * 1.2
          if (isBelowHeader) {
-            isVisible.value = false
-            setStyles({ ...mergedOptions.leaveStyles, ...VISIBILITY_HIDDEN })
+            setStyles({ ...mergedOptions.leaveStyles, visibility: 'hidden' })
          }
       })
+      isInstantRestoration = false
+   }
+
+   function setAriaHidden() {
+      unref(target)?.setAttribute('aria-hidden', 'true')
+   }
+
+   function removeAriaHidden() {
+      unref(target)?.removeAttribute('aria-hidden')
+   }
+
+   function removeVisibility() {
+      unref(target)?.style.removeProperty('visibility')
    }
 
    function onVisible() {
-      setStyles({ ...mergedOptions.enterStyles, ...VISIBILITY_VISIBLE })
+      removeAriaHidden()
+      removeVisibility()
+      setStyles({ ...mergedOptions.enterStyles })
    }
 
    function onHidden() {
+      setAriaHidden()
       setStyles(mergedOptions.leaveStyles)
-
-      const el = unref(target)
-      if (el) {
-         el.ontransitionend = () => {
-            if (!isVisible.value) setStyles(VISIBILITY_HIDDEN)
-            el.ontransitionend = null
-         }
-      }
    }
 
    // Event handlers
@@ -145,15 +151,15 @@ export function useFixedHeader(
          const isScrollingDown = getScrollTop() > prevTop
 
          if (isTopReached) {
-            isVisible.value = true
+            onVisible()
          } else {
-            if (prevTop !== 0) {
+            if (prevTop > 0) {
                if (isScrollingUp && captureEnterDelta) {
                   captureEnterDelta = false
 
                   captureDelta((value) => {
                      if (value >= mergedOptions.enterDelta) {
-                        isVisible.value = true
+                        onVisible()
                      }
 
                      captureEnterDelta = true
@@ -163,7 +169,7 @@ export function useFixedHeader(
 
                   captureDelta((value) => {
                      if (value >= mergedOptions.leaveDelta) {
-                        isVisible.value = false
+                        onHidden()
                      }
 
                      captureLeaveDelta = true
@@ -184,6 +190,7 @@ export function useFixedHeader(
       if (isListeningScroll) {
          // If the header is not anymore fixed or sticky
          if (!isValid) {
+            removeAriaHidden()
             removeStyles()
             toggleScollListener(true)
          }
@@ -206,7 +213,6 @@ export function useFixedHeader(
    }
 
    let skipInitial = true
-   let resizeObserver: ResizeObserver | undefined = undefined
 
    function addResizeObserver() {
       resizeObserver = new ResizeObserver(() => {
@@ -221,55 +227,45 @@ export function useFixedHeader(
    function resetListeners() {
       toggleScollListener(true)
       resizeObserver?.disconnect()
-      isVisible.value = true
    }
 
    // Watchers
 
    watch(
       () => [unref(target), unref(mergedOptions.root)],
-      (_target, _, onCleanup) => {
+      (targetEl, _, onCleanup) => {
          if (isSSR) return
 
-         onCleanup(resetListeners)
-
-         if (_target) {
+         if (targetEl) {
             /**
-             * Resize listener is added in any case as is in charge
-             * of toggling the scroll listener if the header
-             * turns from fixed/sticky to something else.
+             * Resize listener is added in any case as it is
+             * in charge of toggling the scroll listener if the header
+             * turns from fixed/sticky to something else and viceversa.
              */
-
             addResizeObserver()
-
             if (!isFixed()) return
 
             /**
-             * Immediately hides the header on page load, this has no effect if
-             * scroll restoration is smooth (nuxt default behavior)
+             * Immediately hides the header on page load, this has effect
+             * only if scroll restoration is not smooth.
              */
             onInstantScrollRestoration()
 
-            // This hides the header in case of smooth-scroll restoration
-            toggleScollListener()
+            /**
+             * Start listening scroll events, it will hide the header
+             * in case of smooth-scroll restoration.
+             */
+            toggleFunctionalities()
          }
+
+         onCleanup(resetListeners)
       },
       { immediate: true, flush: 'post' }
    )
-
-   // Updates styles once scroll listener is up and running
-   watch(isVisible, (_isVisible) => {
-      if (!isListeningScroll) return
-
-      if (_isVisible) onVisible()
-      else onHidden()
-   })
 
    watch(mergedOptions.watch, toggleFunctionalities, { flush: 'post' })
 
    // Lifecycle
 
    onBeforeUnmount(resetListeners)
-
-   return isVisible
 }

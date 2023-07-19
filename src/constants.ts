@@ -7,9 +7,6 @@ export const DEFAULT_ENTER_DELTA = 0.5
 
 export const DEFAULT_LEAVE_DELTA = 0.15
 
-export const VISIBILITY_HIDDEN = { visibility: 'hidden' } as const
-export const VISIBILITY_VISIBLE = { visibility: 'visible' } as const
-
 const easing = 'cubic-bezier(0.16, 1, 0.3, 1)'
 
 export const defaultOptions: UseFixedHeaderOptions = {
