@@ -1,5 +1,7 @@
 import { mount } from 'cypress/vue'
 
+import 'cypress-real-events'
+
 import './commands'
 
 import WindowScroll from '../../tests/components/WindowScroll.vue'
