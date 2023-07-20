@@ -38,7 +38,7 @@ function testScrollUp({ delta, isCustom } = { delta: DEFAULT_ENTER_DELTA, isCust
             .scrollToHide()
             .get('header')
             .should('not.be.visible')
-            .scrollRootWithDelta({ delta: delta * 15, scrollDown: false })
+            .scrollRootWithDelta({ delta: delta * 2, scrollDown: false })
             .get('header')
             .should('be.visible')
       })

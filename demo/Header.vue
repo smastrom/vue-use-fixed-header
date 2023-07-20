@@ -13,6 +13,24 @@ useFixedHeader(headerRef)
          <div class="Nav">
             <h2 class="Global_Logo">Vufh</h2>
             <ul class="Nav_List">
+               <li class="Nav_List_Dropdown_Trigger Nav_List_Hidden">
+                  <a target="_blank" href="https://github.com/smastrom/vue-use-fixed-header">
+                     Dropdown
+                  </a>
+
+                  <ul class="Nav_List_Dropdown">
+                     <li>
+                        <a target="_blank" href="#">Dropdown Item 1</a>
+                     </li>
+                     <li>
+                        <a target="_blank" href="#">Dropdown Item 2</a>
+                     </li>
+                     <li>
+                        <a target="_blank" href="#">Dropdown Item 3</a>
+                     </li>
+                  </ul>
+               </li>
+
                <li>
                   <a target="_blank" href="https://github.com/smastrom/vue-use-fixed-header">
                      GitHub
@@ -72,9 +90,17 @@ useFixedHeader(headerRef)
 }
 
 .Nav_List {
+   height: 100%;
    display: flex;
+   align-items: center;
    list-style: none;
    gap: 3rem;
+}
+
+.Nav_List li {
+   height: 100%;
+   display: flex;
+   align-items: center;
 }
 
 .Nav_List a {
@@ -83,9 +109,27 @@ useFixedHeader(headerRef)
    transition: color 200ms ease-in-out;
 }
 
-.Nav_List a:hover {
-   color: var(--AccentColor);
-   text-decoration: none;
+.Nav_List_Dropdown_Trigger {
+   position: relative;
+}
+
+.Nav_List_Dropdown_Trigger:hover .Nav_List_Dropdown {
+   display: flex;
+}
+
+.Nav_List_Dropdown {
+   position: absolute;
+   top: 45px;
+   left: 0;
+   width: 200px;
+   background-color: var(--WhiteColor);
+   box-shadow: var(--Shadow);
+   border-radius: 0.5rem;
+   padding: 1rem;
+   display: none;
+   flex-direction: column;
+   gap: 1rem;
+   list-style: none;
 }
 
 .Nav_List_Button {
@@ -97,6 +141,15 @@ useFixedHeader(headerRef)
 }
 
 @media (hover: hover) {
+   .Nav_List_Dropdown_Trigger:hover > a {
+      color: var(--AccentColor);
+   }
+
+   .Nav_List a:hover {
+      color: var(--AccentColor);
+      text-decoration: none;
+   }
+
    .Nav_List_Button:hover {
       opacity: 0.5;
    }
@@ -110,7 +163,7 @@ useFixedHeader(headerRef)
       gap: 2rem;
    }
    .Nav_List_Hidden {
-      display: none;
+      display: none !important;
    }
 }
 </style>

@@ -13,10 +13,10 @@ Turn your boring fixed header into a smart one with one line of code.
 ## Features
 
 -  **Dead simple** - Call a function and you're done whether you're SSR'ing or not
--  **Lightweight** - Just over 1kb without dependencies
--  **Powerful** - Uses acceleration delta for both hiding and showing instead of fixed thresholds
+-  **Lightweight** - Just over 1kb without any dependency
 -  **Enjoyable** - When scrolling down, the header is hidden, when scrolling up, the header is shown.
--  **User-centric** - Behaves as your users expect on page load, different styles of scroll restoration and on top reached
+-  **Powerful** - Uses acceleration delta for both hiding and showing instead of fixed thresholds
+-  **User-centric** - Behaves as your users expect on page load, scroll restoration, hovering, dropdown navigation, on top reached.
 -  **Smart** - Functionalities are automatically enabled/disabled if your header turns from fixed/sticky to something else or it is hidden at different viewports
 -  **Flexible** - Works with any scrolling container and with your own transition styles
 
@@ -59,23 +59,29 @@ useFixedHeader(headerRef)
 </style>
 ```
 
-:warning: There's only **one rule** to respect: Do not apply any _visibility_ or _transition-related_ property since they're handled internally for you.
+As long as your header position is set to fixed/sticky, it will behave as described in the [features](#features) section.
 
-> See [below](#customization) how to customize transitions.
+> :warning: There's only **one rule** to respect: Do not apply any _transition-related_ property since they're handled internally. See [below](#customization) how to customize them.
 
 <br />
 
 ## Automatic behavior toggling
 
+On resize, `useFixedHeader` checks your header's `position` and `display` properties to determine whether its functionalities should be enabled or not.
+
+_Disabled_ means that the header will behave as you're not using the composable at all: no event listeners are attached and no additional styles are applied.
+
 ### Different viewports
 
-If at different viewports your header is not fixed/sticky anymore (or it is hidden), functionalities are automatically disabled and enabled again when needed.
-
-Disabling functionalities means that the header will behave as you're not using `useFixedHeader` at all.
+If at different viewports your header position is not fixed/sticky (or it is hidden), functionalities are automatically toggled when needed.
 
 So feel free to have code like this:
 
 ```css
+.Header {
+   position: fixed;
+}
+
 @media (max-width: 768px) {
    .Header {
       position: relative;
@@ -89,11 +95,11 @@ So feel free to have code like this:
 }
 ```
 
-It will just work.
+It will just work as expected.
 
 ### Advanced scenarios
 
-Let's say your header in some pages is not supposed to be fixed/sticky and you're using some reactive logic to change its styles.
+Let's suppose your header in some pages is not fixed/sticky and you're using some reactive logic to style the `position` property.
 
 You can pass a reactive source to the `watch` property of `useFixedHeader` to perform a check everytime the value changes:
 
@@ -117,7 +123,7 @@ useFixedHeader(headerRef, {
 </template>
 ```
 
-`useFixedHeader` will automatically toggle functionalities when needed.
+`useFixedHeader` will automatically toggle functionalities when navigating to/from the _Pricing_ page.
 
 > You can pass either a `ref` or a `computed` (without `.value`).
 
@@ -159,7 +165,7 @@ useFixedHeader(headerRef, {
 
 ## Accessibility - Reduced Motion
 
-This is not done for you and must be implemented manually using the `prefers-reduced-motion` media query:
+This is not done for you and must be implemented manually using `prefers-reduced-motion` media query:
 
 ```css
 @media (prefers-reduced-motion: reduce) {
