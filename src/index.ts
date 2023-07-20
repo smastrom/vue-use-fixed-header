@@ -12,10 +12,12 @@ export function useFixedHeader(
    const mergedOptions = mergeDefined(defaultOptions, options)
 
    let resizeObserver: ResizeObserver | undefined = undefined
+
    let isListeningScroll = false
+   let isHovering = false
    let isInstantRestoration = true
 
-   // Utils
+   // Elements utils
 
    function getRoot() {
       if (isSSR) return null
@@ -53,6 +55,8 @@ export function useFixedHeader(
       return headerHeight
    }
 
+   // Styles utils
+
    function setStyles(styles: CSSProperties) {
       const el = unref(target)
       if (el) Object.assign(el.style, styles)
@@ -70,6 +74,8 @@ export function useFixedHeader(
       properties.forEach((prop) => unref(target)?.style.removeProperty(prop))
    }
 
+   // Callbacks
+
    /**
     * Hides the header on page load before it has a chance to paint,
     * only if scroll restoration is instant.
@@ -85,9 +91,7 @@ export function useFixedHeader(
 
       requestAnimationFrame(() => {
          const isBelowHeader = getScrollTop() > getHeaderHeight() * 1.2
-         if (isBelowHeader) {
-            setStyles({ ...mergedOptions.leaveStyles, visibility: 'hidden' })
-         }
+         if (isBelowHeader) setStyles({ ...mergedOptions.leaveStyles, visibility: 'hidden' })
       })
       isInstantRestoration = false
    }
@@ -119,7 +123,7 @@ export function useFixedHeader(
       setStyles(mergedOptions.leaveStyles)
    }
 
-   // Event handlers
+   // Scroll
 
    function createScrollHandler() {
       let captureEnterDelta = true
@@ -157,7 +161,7 @@ export function useFixedHeader(
          if (isTopReached) {
             onVisible()
          } else {
-            if (prevTop > 0) {
+            if (!isHovering && prevTop > 0) {
                if (isScrollingUp && captureEnterDelta) {
                   captureEnterDelta = false
 
@@ -188,23 +192,7 @@ export function useFixedHeader(
 
    const onScroll = createScrollHandler()
 
-   function toggleFunctionalities() {
-      const isValid = isFixed()
-
-      if (isListeningScroll) {
-         // If the header is not anymore fixed or sticky
-         if (!isValid) {
-            removeAriaHidden()
-            removeStyles()
-            toggleScrollListener(true)
-         }
-         // If was not listening and now is fixed or sticky
-      } else {
-         if (isValid) toggleScrollListener()
-      }
-   }
-
-   function toggleScrollListener(isRemove = false) {
+   function toggleScroll(isRemove = false) {
       const root = getRoot()
       if (!root) return
 
@@ -216,21 +204,63 @@ export function useFixedHeader(
       isListeningScroll = !isRemove
    }
 
+   // Pointer
+
+   function setHover() {
+      isHovering = true
+   }
+
+   function removeHover() {
+      isHovering = false
+   }
+
+   function togglePointer(isRemove = false) {
+      const method = isRemove ? 'removeEventListener' : 'addEventListener'
+
+      unref(target)?.[method]('pointermove', setHover)
+      unref(target)?.[method]('pointerleave', removeHover)
+   }
+
+   // Listeners toggles
+
+   function toggleListeners() {
+      const isValid = isFixed()
+
+      if (isListeningScroll) {
+         // If the header is not anymore fixed or sticky
+         if (!isValid) {
+            removeAriaHidden()
+            removeStyles()
+            toggleScroll(true)
+            togglePointer(true)
+         }
+         // If was not listening and now is fixed or sticky
+      } else {
+         if (isValid) {
+            toggleScroll()
+            togglePointer()
+         }
+      }
+   }
+
+   function cleanListeners() {
+      toggleScroll(true)
+      togglePointer(true)
+      resizeObserver?.disconnect()
+   }
+
+   // Resize observer
+
    let skipInitial = true
 
    function addResizeObserver() {
       resizeObserver = new ResizeObserver(() => {
          if (skipInitial) return (skipInitial = false)
-         toggleFunctionalities()
+         toggleListeners()
       })
 
       const root = getRoot()
       if (root) resizeObserver.observe(root)
-   }
-
-   function resetListeners() {
-      toggleScrollListener(true)
-      resizeObserver?.disconnect()
    }
 
    // Watchers
@@ -248,8 +278,8 @@ export function useFixedHeader(
 
          if (targetEl) {
             /**
-             * Resize listener is added in any case as it is
-             * in charge of toggling the scroll listener if the header
+             * Resize observer is added in any case as it is
+             * in charge of toggling scroll/pointer listeners if the header
              * turns from fixed/sticky to something else and vice-versa.
              */
             addResizeObserver()
@@ -265,17 +295,17 @@ export function useFixedHeader(
              * Start listening scroll events, it will hide the header
              * in case of smooth-scroll restoration.
              */
-            toggleFunctionalities()
+            toggleListeners()
          }
 
-         onCleanup(resetListeners)
+         onCleanup(cleanListeners)
       },
       { immediate: true, flush: 'post' }
    )
 
-   watch(mergedOptions.watch, toggleFunctionalities, { flush: 'post' })
+   watch(mergedOptions.watch, toggleListeners, { flush: 'post' })
 
    // Lifecycle
 
-   onBeforeUnmount(resetListeners)
+   onBeforeUnmount(cleanListeners)
 }
