@@ -1,13 +1,13 @@
 import { onBeforeUnmount, unref, watch, type CSSProperties } from 'vue'
 
-import { mergeDefined, isSSR } from './utils'
+import { mergeDefined, isSSR, isReducedMotion } from './utils'
 import { CAPTURE_DELTA_FRAME_COUNT, defaultOptions } from './constants'
 
 import type { UseFixedHeaderOptions, MaybeTemplateRef } from './types'
 
 export function useFixedHeader(
    target: MaybeTemplateRef,
-   options: Partial<UseFixedHeaderOptions> = defaultOptions
+   options: Partial<UseFixedHeaderOptions> = defaultOptions,
 ) {
    const mergedOptions = mergeDefined(defaultOptions, options)
 
@@ -115,12 +115,21 @@ export function useFixedHeader(
 
    function onVisible() {
       removeAriaHidden()
-      setStyles({ ...mergedOptions.enterStyles, visibility: '' as CSSProperties['visibility'] })
+
+      setStyles({
+         ...mergedOptions.enterStyles,
+         visibility: '' as CSSProperties['visibility'],
+         ...(isReducedMotion() ? { transition: 'none' } : {}),
+      })
    }
 
    function onHidden() {
       setAriaHidden()
-      setStyles(mergedOptions.leaveStyles)
+
+      setStyles({
+         ...mergedOptions.leaveStyles,
+         ...(isReducedMotion() ? { transition: 'none' } : {}),
+      })
    }
 
    // Scroll
@@ -300,7 +309,7 @@ export function useFixedHeader(
 
          onCleanup(cleanListeners)
       },
-      { immediate: true, flush: 'post' }
+      { immediate: true, flush: 'post' },
    )
 
    watch(mergedOptions.watch, toggleListeners, { flush: 'post' })

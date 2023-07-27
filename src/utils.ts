@@ -11,3 +11,9 @@ export function mergeDefined<T>(defaults: Required<T>, options: T): Required<T> 
 }
 
 export const isSSR = typeof window === 'undefined'
+
+export function isReducedMotion() {
+   if (isSSR) return false
+
+   return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
