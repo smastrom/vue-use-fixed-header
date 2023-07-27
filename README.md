@@ -16,7 +16,7 @@ Turn your boring fixed header into a smart one with one line of code.
 -  **Lightweight** - Just over 1kb without any dependency
 -  **Enjoyable** - When scrolling down, the header is hidden, when scrolling up, the header is shown.
 -  **Powerful** - Uses acceleration delta for both hiding and showing instead of fixed thresholds
--  **User-centric** - Behaves as your users expect on page load, scroll restoration, hovering, dropdown navigation, on top reached.
+-  **User-centric** - Behaves as your users expect on page load, scroll restoration, hovering, dropdown navigation, top reached and reduced motion.
 -  **Smart** - Functionalities are automatically enabled/disabled if your header turns from fixed/sticky to something else or it is hidden at different viewports
 -  **Flexible** - Works with any scrolling container and with your own transition styles
 
@@ -159,21 +159,6 @@ useFixedHeader(headerRef, {
       transform: 'translateY(-100%)',
    },
 })
-```
-
-<br />
-
-## Accessibility - Reduced Motion
-
-This is not done for you and must be implemented manually using `prefers-reduced-motion` media query:
-
-```css
-@media (prefers-reduced-motion: reduce) {
-   .Header {
-      transition-duration: 0s;
-      transition-delay: 0s;
-   }
-}
 ```
 
 <br />
