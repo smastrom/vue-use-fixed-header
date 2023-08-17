@@ -1,4 +1,4 @@
-import type { Ref, ComputedRef, CSSProperties } from 'vue'
+import type { Ref, ComputedRef, CSSProperties, ShallowRef } from 'vue'
 
 export type MaybeTemplateRef = HTMLElement | null | Ref<HTMLElement | null>
 
@@ -31,7 +31,7 @@ export interface UseFixedHeaderOptions<T = any> {
 }
 
 export interface UseFixedHeaderReturn {
-   styles: CSSProperties
+   styles: ShallowRef<CSSProperties>
    isLeave: ComputedRef<boolean>
    isEnter: ComputedRef<boolean>
 }

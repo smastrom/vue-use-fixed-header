@@ -1,11 +1,11 @@
 import {
    onBeforeUnmount,
+   shallowRef,
    ref,
    unref,
    watch,
-   nextTick,
-   shallowReactive,
    computed,
+   readonly,
    type CSSProperties,
 } from 'vue'
 
@@ -34,15 +34,15 @@ export function useFixedHeader(
 
    // Internal state
 
-   const styles = shallowReactive<CSSProperties>({})
+   const styles = shallowRef<CSSProperties>({})
    const state = ref<State>(State.READY)
 
    function setStyles(newStyles: CSSProperties) {
-      Object.assign(styles, newStyles)
+      styles.value = newStyles
    }
 
    function removeStyles() {
-      Object.keys(styles).forEach((key) => delete styles[key as keyof CSSProperties])
+      styles.value = {}
    }
 
    function setState(newState: State) {
@@ -52,8 +52,6 @@ export function useFixedHeader(
    // Target utils
 
    function getRoot() {
-      if (isSSR) return null
-
       const root = unref(mergedOptions.root)
       if (root != null) return root
 
@@ -114,7 +112,9 @@ export function useFixedHeader(
 
       setStyles({
          ...mergedOptions.enterStyles,
-         ...(mergedOptions.toggleVisibility ? { visibility: undefined } : {}),
+         ...(mergedOptions.toggleVisibility
+            ? { visibility: '' as CSSProperties['visibility'] }
+            : {}),
          ...(isReducedMotion() ? { transition: 'none' } : {}),
       })
 
@@ -140,7 +140,7 @@ export function useFixedHeader(
 
       if (e.target !== unref(target)) return
 
-      setStyles({ visibility: 'hidden' })
+      setStyles({ ...mergedOptions.leaveStyles, visibility: 'hidden' })
    }
 
    function toggleTransitionListener(isRemove = false) {
@@ -227,7 +227,7 @@ export function useFixedHeader(
       const root = getRoot()
       if (!root) return
 
-      const scrollRoot = root === document.documentElement ? window : root
+      const scrollRoot = root === document.documentElement ? document : root
       const method = isRemove ? 'removeEventListener' : 'addEventListener'
 
       scrollRoot[method]('scroll', onScroll, { passive: true })
@@ -237,20 +237,19 @@ export function useFixedHeader(
 
    // Pointer
 
-   const setHover = () => (isHovering = true)
-   const removeHover = () => (isHovering = false)
+   function setPointer(e: PointerEvent) {
+      isHovering = unref(target)?.contains(e.target as Node) ?? false
+   }
 
    function togglePointer(isRemove = false) {
       const method = isRemove ? 'removeEventListener' : 'addEventListener'
 
-      unref(target)?.[method]('pointermove', setHover)
-      unref(target)?.[method]('pointerleave', removeHover)
+      document[method]('pointermove', setPointer as EventListener)
    }
 
    // Listeners
 
    function removeListeners() {
-      toggleTransitionListener(true)
       toggleScroll(true)
       togglePointer(true)
    }
@@ -262,7 +261,7 @@ export function useFixedHeader(
          // If the header is not anymore fixed or sticky
          if (!isValid) {
             removeListeners()
-            nextTick(removeStyles)
+            removeStyles()
          }
          // If was not listening and now is fixed or sticky
       } else {
@@ -302,10 +301,10 @@ export function useFixedHeader(
     */
    watch(
       () => [unref(target), unref(mergedOptions.root)],
-      (targetEl, _, onCleanup) => {
-         if (isSSR) return
+      ([targetEl, rootEl], _, onCleanup) => {
+         const shouldInit = !isSSR && targetEl && (rootEl || rootEl === null)
 
-         if (targetEl) {
+         if (shouldInit) {
             /**
              * Resize observer is added in any case as it is
              * in charge of toggling scroll/pointer listeners if the header
@@ -316,7 +315,7 @@ export function useFixedHeader(
 
             /**
              * Immediately hides the header on page load, this has effect
-             * only if scroll restoration is not smooth and toggleVisibility
+             * only if scroll restoration is not smooth and 'toggleVisibility'
              * is set to true.
              */
             onInstantScrollRestoration()
@@ -338,7 +337,7 @@ export function useFixedHeader(
    onBeforeUnmount(_onCleanup)
 
    return {
-      styles,
+      styles: readonly(styles),
       isLeave: computed(() => state.value === State.LEAVE),
       isEnter: computed(() => state.value === State.ENTER),
    }

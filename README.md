@@ -138,6 +138,8 @@ useFixedHeader(headerRef, {
 
 ## Customization
 
+> Default values are displayed below.
+
 ```ts
 const { styles, isEnter, isLeave } = useFixedHeader(headerRef, {
    /**
@@ -168,15 +170,15 @@ const { styles, isEnter, isLeave } = useFixedHeader(headerRef, {
     *
     * Custom styles applied when scrolling up */
    enterStyles: {
-      transition: `transform 0.3s ease-out`,
+      transition: `transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)`,
       transform: 'translateY(0px)',
    },
    /**
     *
     * Custom styles applied when scrolling down */
    leaveStyles: {
-      transition: `transform 0.5s ease-out`,
-      transform: 'translateY(-100%)',
+      transition: `transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)`,
+      transform: 'translateY(-101%)',
    },
 })
 ```
