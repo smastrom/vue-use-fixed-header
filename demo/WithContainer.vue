@@ -7,7 +7,7 @@ import Header from './Header.vue'
 const containerRef = ref<HTMLElement | null>(null)
 const headerRef = ref<HTMLElement | null>(null)
 
-useFixedHeader(headerRef, {
+const { styles } = useFixedHeader(headerRef, {
    root: containerRef,
 })
 </script>
@@ -15,7 +15,7 @@ useFixedHeader(headerRef, {
 <template>
    <div class="Scroll_Container" ref="containerRef">
       <div class="Container">
-         <header class="Header_Wrapper" ref="headerRef">
+         <header class="Header_Wrapper" ref="headerRef" :style="styles">
             <div class="Header_Container">
                <h2 class="Global_Logo">Vufh</h2>
 
@@ -80,7 +80,9 @@ useFixedHeader(headerRef, {
    line-height: 1;
    padding: 0.65rem 1rem;
    text-decoration: none;
-   transition: color 200ms ease-in-out, background-color 200ms ease-in-out;
+   transition:
+      color 200ms ease-in-out,
+      background-color 200ms ease-in-out;
 }
 
 @media (hover: hover) {
@@ -103,3 +105,4 @@ useFixedHeader(headerRef, {
    text-align: center;
 }
 </style>
+../src/useFixedHeader

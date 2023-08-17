@@ -2,7 +2,7 @@
 
 # Vue Use Fixed Header
 
-Turn your boring fixed header into a smart one with one line of code.
+Turn your boring fixed header into a smart one with three lines of code.
 
 <br />
 
@@ -12,13 +12,12 @@ Turn your boring fixed header into a smart one with one line of code.
 
 ## Features
 
--  **Dead simple** - Call a function and you're done whether you're SSR'ing or not
--  **Lightweight** - Just over 1kb without any dependency
--  **Enjoyable** - When scrolling down, the header is hidden, when scrolling up, the header is shown.
--  **Powerful** - Uses acceleration delta for both hiding and showing instead of fixed thresholds
--  **User-centric** - Behaves as your users expect on page load, scroll restoration, hovering, dropdown navigation, top reached and reduced motion.
+-  **Dead simple** - Write three lines of code and you're done.
+-  **Enjoyable defaults** - When scrolling down, the header is hidden, when scrolling up, the header is shown.
+-  **Powerful** - Uses acceleration delta (scroll speed) for both hiding and showing instead of fixed thresholds.
+-  **Intuitive** - Behaves as expected on page load, scroll restoration, hovering, dropdown navigation, top-reached and reduced motion.
 -  **Smart** - Functionalities are automatically enabled/disabled if your header turns from fixed/sticky to something else or it is hidden at different viewports
--  **Flexible** - Works with any scrolling container and with your own transition styles
+-  **Flexible** - Works with any scrolling container and with your own styles
 
 <br />
 
@@ -28,11 +27,21 @@ Turn your boring fixed header into a smart one with one line of code.
 pnpm add vue-use-fixed-header
 ```
 
+Or:
+
+```bash
+yarn add vue-use-fixed-header
+```
+
+```bash
+npm i vue-use-fixed-header
+```
+
 <br />
 
 ## Usage
 
-Pass your header's template ref to `useFixedHeader`. Then style it as you normally would. That's it.
+Pass your header's template ref to `useFixedHeader`. Then apply the returned reactive styles. That's it.
 
 ```vue
 <script setup>
@@ -41,11 +50,11 @@ import { useFixedHeader } from 'vue-use-fixed-header'
 
 const headerRef = ref(null)
 
-useFixedHeader(headerRef)
+const { styles } = useFixedHeader(headerRef)
 </script>
 
 <template>
-   <header class="Header" ref="headerRef">
+   <header class="Header" ref="headerRef" :style="styles">
       <!-- Your content -->
    </header>
 </template>
@@ -59,9 +68,7 @@ useFixedHeader(headerRef)
 </style>
 ```
 
-As long as your header position is set to fixed/sticky, it will behave as described in the [features](#features) section.
-
-> :warning: There's only **one rule** to respect: Do not apply any _transition-related_ property since they're handled internally. See [below](#customization) how to customize them.
+All you have to do is to set `position: fixed` (or `sticky`) to your header. `useFixedHeader` will take care of the rest.
 
 <br />
 
@@ -69,25 +76,25 @@ As long as your header position is set to fixed/sticky, it will behave as descri
 
 On resize, `useFixedHeader` checks your header's `position` and `display` properties to determine whether its functionalities should be enabled or not.
 
-_Disabled_ means that the header will behave as you're not using the composable at all: no event listeners are attached and no additional styles are applied.
+_Disabled_ means that no event listeners are attached and the returned styles match an empty object `{}`.
 
 ### Different viewports
 
-If at different viewports your header position is not fixed/sticky (or it is hidden), functionalities are automatically toggled when needed.
-
-So feel free to have code like this:
+Hence feel free to have code like this:
 
 ```css
 .Header {
    position: fixed;
 }
 
+/* Will be disabled */
 @media (max-width: 768px) {
    .Header {
       position: relative;
    }
 }
 
+/* Same */
 @media (max-width: 375px) {
    .Header {
       display: none;
@@ -132,28 +139,41 @@ useFixedHeader(headerRef, {
 ## Customization
 
 ```ts
-useFixedHeader(headerRef, {
+const { styles, isEnter, isLeave } = useFixedHeader(headerRef, {
    /**
+    *
     * Use `null` if content is scrolled by the window,
     * otherwise pass a custom scrolling container template ref */
    root: null,
    /**
+    *
     * ref or computed to watch for automatic behavior toggling */
    watch: () => null,
    /**
-    * Minimum acceleration delta required to show the header */
+    *
+    * Minimum acceleration delta required to show the header.
+    * An higher value means that the user has to scroll faster. */
    enterDelta: 0.5,
    /**
+    *
     * Minimum acceleration delta required to hide the header */
    leaveDelta: 0.15,
    /**
-    * Custom enter transition styles */
+    *
+    * Whether to toggle `visibility: hidden` on leave.
+    * Set this to `false` if you want to keep the header
+    * visible. */
+   toggleVisibility: true,
+   /**
+    *
+    * Custom styles applied when scrolling up */
    enterStyles: {
       transition: `transform 0.3s ease-out`,
       transform: 'translateY(0px)',
    },
    /**
-    * Custom leave transition styles */
+    *
+    * Custom styles applied when scrolling down */
    leaveStyles: {
       transition: `transform 0.5s ease-out`,
       transform: 'translateY(-100%)',

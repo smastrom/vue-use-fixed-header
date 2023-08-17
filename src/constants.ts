@@ -9,10 +9,11 @@ export const DEFAULT_LEAVE_DELTA = 0.15
 
 const easing = 'cubic-bezier(0.16, 1, 0.3, 1)'
 
-export const defaultOptions: UseFixedHeaderOptions = {
+export const defaultOptions: Required<UseFixedHeaderOptions> = {
    enterDelta: DEFAULT_ENTER_DELTA,
    leaveDelta: DEFAULT_LEAVE_DELTA,
    root: null,
+   toggleVisibility: true,
    enterStyles: {
       transition: `transform 0.3s ${easing} 0s`,
       transform: 'translateY(0px)',

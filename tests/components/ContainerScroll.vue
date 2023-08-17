@@ -23,7 +23,7 @@ onBeforeMount(() => {
    })
 })
 
-useFixedHeader(headerRef, {
+const { styles } = useFixedHeader(headerRef, {
    root: containerRef,
    enterDelta: props.enterDelta,
    leaveDelta: props.leaveDelta,
@@ -36,7 +36,7 @@ useFixedHeader(headerRef, {
    <div class="Wrapper">
       <div class="Scroller" ref="containerRef">
          <div class="Container">
-            <header class="Header" ref="headerRef" />
+            <header class="Header" ref="headerRef" :style="styles" />
          </div>
       </div>
    </div>
@@ -89,3 +89,4 @@ useFixedHeader(headerRef, {
    }
 }
 </style>
+../../src/useFixedHeader

@@ -13,7 +13,7 @@ export default defineConfig(({ mode }) => {
             entry: 'src/index.ts',
             name: 'vue-use-fixed-header',
             fileName: 'index',
-            formats: ['es', 'cjs'],
+            formats: ['es'],
          },
          rollupOptions: {
             external: ['vue'],
@@ -35,8 +35,6 @@ export default defineConfig(({ mode }) => {
       plugins: [
          dts({
             include: ['src'],
-            staticImport: true,
-            insertTypesEntry: true,
             rollupTypes: true,
          }),
          vue(),

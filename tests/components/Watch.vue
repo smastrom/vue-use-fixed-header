@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, unref, computed, type Ref } from 'vue'
+import { ref, computed, type Ref } from 'vue'
 import { useFixedHeader } from '../../src'
 
 const props = defineProps<{
@@ -8,7 +8,7 @@ const props = defineProps<{
 
 const headerRef = ref<HTMLElement | null>(null)
 
-useFixedHeader(headerRef, {
+const { styles } = useFixedHeader(headerRef, {
    watch: props.watch,
 })
 
@@ -21,6 +21,7 @@ const position = computed(() => (props.watch.value ? 'relative' : 'fixed'))
          class="Header"
          ref="headerRef"
          :style="{
+            ...styles,
             position,
          }"
       />
@@ -40,3 +41,4 @@ const position = computed(() => (props.watch.value ? 'relative' : 'fixed'))
    background: red;
 }
 </style>
+../../src/useFixedHeader
