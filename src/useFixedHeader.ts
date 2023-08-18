@@ -6,7 +6,7 @@ import {
    watch,
    computed,
    readonly,
-   type CSSProperties,
+   type CSSProperties as CSS,
 } from 'vue'
 
 import { mergeDefined, isSSR, isReducedMotion } from './utils'
@@ -15,9 +15,9 @@ import { CAPTURE_DELTA_FRAME_COUNT, defaultOptions } from './constants'
 import type { UseFixedHeaderOptions, MaybeTemplateRef, UseFixedHeaderReturn } from './types'
 
 enum State {
-   READY = 'READY',
-   ENTER = 'ENTER',
-   LEAVE = 'LEAVE',
+   READY,
+   ENTER,
+   LEAVE,
 }
 
 export function useFixedHeader(
@@ -30,14 +30,13 @@ export function useFixedHeader(
 
    let isListeningScroll = false
    let isHovering = false
-   let isInstantRestoration = true
 
    // Internal state
 
-   const styles = shallowRef<CSSProperties>({})
+   const styles = shallowRef<CSS>({})
    const state = ref<State>(State.READY)
 
-   function setStyles(newStyles: CSSProperties) {
+   function setStyles(newStyles: CSS) {
       styles.value = newStyles
    }
 
@@ -88,21 +87,24 @@ export function useFixedHeader(
    // Callbacks
 
    /**
-    * Hides the header on page load before it has a chance to paint,
-    * only if scroll restoration is instant.
-    *
-    * If not instant (smooth-scroll) 'isBelowHeader' will resolve
-    * to false and the header will be visible until next scroll.
+    * Hides the header on page load before it has a chance to paint
+    * if scroll restoration is instant. If not, applies the enter
+    * styles immediately (without transitions).
     */
-   function onInstantScrollRestoration() {
-      if (!mergedOptions.toggleVisibility) return
-      if (!isInstantRestoration) return
-
+   function onScrollRestoration() {
       requestAnimationFrame(() => {
-         const isBelowHeader = getScrollTop() > getHeaderHeight() * 1.2
-         if (isBelowHeader) setStyles({ ...mergedOptions.leaveStyles, visibility: 'hidden' })
+         const isInstant = getScrollTop() > getHeaderHeight() * 1.2 // Resolves to false if scroll is smooth
+
+         if (isInstant) {
+            setStyles({
+               ...mergedOptions.leaveStyles,
+               ...(mergedOptions.toggleVisibility ? { visibility: 'hidden' } : {}),
+               transition: '', // We don't want transitions to play on page load...
+            })
+         } else {
+            setStyles({ ...mergedOptions.enterStyles, transition: '' }) //...same here
+         }
       })
-      isInstantRestoration = false
    }
 
    function onVisible() {
@@ -112,9 +114,7 @@ export function useFixedHeader(
 
       setStyles({
          ...mergedOptions.enterStyles,
-         ...(mergedOptions.toggleVisibility
-            ? { visibility: '' as CSSProperties['visibility'] }
-            : {}),
+         ...(mergedOptions.toggleVisibility ? { visibility: '' as CSS['visibility'] } : {}),
          ...(isReducedMotion() ? { transition: 'none' } : {}),
       })
 
@@ -140,12 +140,13 @@ export function useFixedHeader(
 
       if (e.target !== unref(target)) return
 
-      setStyles({ ...mergedOptions.leaveStyles, visibility: 'hidden' })
+      setStyles({
+         ...mergedOptions.leaveStyles,
+         ...(mergedOptions.toggleVisibility ? { visibility: 'hidden' } : {}),
+      })
    }
 
    function toggleTransitionListener(isRemove = false) {
-      if (!mergedOptions.toggleVisibility) return
-
       const el = unref(target)
       if (!el) return
 
@@ -313,17 +314,7 @@ export function useFixedHeader(
             addResizeObserver()
             if (!isFixed()) return
 
-            /**
-             * Immediately hides the header on page load, this has effect
-             * only if scroll restoration is not smooth and 'toggleVisibility'
-             * is set to true.
-             */
-            onInstantScrollRestoration()
-
-            /**
-             * Start listening scroll events, it will hide the header
-             * in case of smooth-scroll restoration.
-             */
+            onScrollRestoration()
             toggleListeners()
          }
 

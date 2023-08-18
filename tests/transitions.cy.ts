@@ -3,18 +3,20 @@ import { defaultOptions } from '../src/constants'
 
 describe('Transitions', () => {
    describe('Page load', () => {
-      it('Styles are not applied if header is visible', () => {
-         cy.mountApp().get('header').should('be.visible').and('not.have.attr', 'style')
+      it('Styles are applied if header is visible, except transition', () => {
+         const { transition, ...enterStyles } = defaultOptions.enterStyles
+         cy.mountApp().get('header').should('be.visible').checkStyles(enterStyles)
       })
 
-      it('Styles are applied if header is hidden (in order to trigger futher enter transition)', () => {
+      it('Styles are applied if header is hidden (in order to trigger further enter transition)', () => {
          cy.mountApp({
             props: {
                simulateInstantRestoration: true,
             },
          })
 
-         cy.get('header').should('be.hidden').checkStyles(defaultOptions.leaveStyles)
+         const { transition, ...leaveStyles } = defaultOptions.leaveStyles
+         cy.get('header').should('be.hidden').checkStyles(leaveStyles)
       })
    })
 

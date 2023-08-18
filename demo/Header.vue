@@ -1,21 +1,10 @@
 <script setup lang="ts">
-import { ref, watchEffect } from 'vue'
+import { ref } from 'vue'
 import { useFixedHeader } from '../src'
 
 const headerRef = ref<HTMLElement | null>(null)
 
-const { styles, isEnter, isLeave } = useFixedHeader(headerRef, {
-   toggleVisibility: true,
-})
-
-watchEffect(() => {
-   console.table([
-      {
-         isEnter: isEnter.value,
-         isLeave: isLeave.value,
-      },
-   ])
-})
+const { styles } = useFixedHeader(headerRef)
 </script>
 
 <template>

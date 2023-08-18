@@ -2,7 +2,7 @@
    "name": "vue-use-fixed-header",
    "description": "Turn your boring fixed header into a smart one with three lines of code.",
    "private": false,
-   "version": "1.0.3",
+   "version": "1.0.4",
    "type": "module",
    "keywords": [
       "vue",
