@@ -93,10 +93,14 @@ export function useFixedHeader(
          if (isInstant) {
             setStyles({
                transform: leaveStyles.transform,
+               ...(config.transitionOpacity ? { opacity: 0 } : {}),
                visibility: 'hidden',
             })
          } else {
-            setStyles({ transform: enterStyles.transform })
+            setStyles({
+               transform: enterStyles.transform,
+               ...(config.transitionOpacity ? { opacity: 1 } : {}),
+            })
          }
 
          internals.isMount = false
@@ -125,6 +129,7 @@ export function useFixedHeader(
 
       setStyles({
          ...enterStyles,
+         ...(config.transitionOpacity ? { opacity: 1 } : {}),
          visibility: '' as CSS['visibility'],
       })
 
@@ -134,7 +139,7 @@ export function useFixedHeader(
    function onHidden() {
       if (state.value === State.LEAVE) return
 
-      setStyles(leaveStyles)
+      setStyles({ ...leaveStyles, ...(config.transitionOpacity ? { opacity: 0 } : {}) })
 
       setState(State.LEAVE)
 
