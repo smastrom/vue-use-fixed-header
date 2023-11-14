@@ -87,7 +87,12 @@ export function useFixedHeader(
     */
    function onScrollRestoration() {
       requestAnimationFrame(() => {
-         if (!internal.isMount || !isFixed()) return
+         if (!internal.isMount) return
+
+         if (!isFixed()) {
+            internal.isMount = false
+            return
+         }
 
          const isInstant = getScrollTop() > getHeaderHeight() * 1.2 // Resolves to false if scroll is smooth
 
