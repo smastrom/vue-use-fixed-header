@@ -1,7 +1,7 @@
 import { shallowRef, ref, unref, watch, computed, readonly, type CSSProperties as CSS } from 'vue'
 
 import { isSSR, useReducedMotion } from './utils'
-import { defaultOptions, TRANSITION_STYLES } from './constants'
+import { TRANSITION_STYLES } from './constants'
 
 import type { UseFixedHeaderOptions, MaybeTemplateRef } from './types'
 
@@ -17,17 +17,18 @@ export function useFixedHeader(
 ) {
    // Config
 
-   const config = { ...defaultOptions, ...options }
-
    const { enterStyles, leaveStyles } = TRANSITION_STYLES
 
-   let resizeObserver: ResizeObserver | undefined = undefined
+   const root = () => (options.root || options.root === null ? unref(options.root) : null)
+   const transitionOpacity = () =>
+      options.transitionOpacity === undefined ? false : unref(options.transitionOpacity)
 
    const isReduced = useReducedMotion()
 
-   // Internal state
+   // State
 
-   const internals = {
+   const internal = {
+      resizeObserver: undefined as ResizeObserver | undefined,
       skipInitialObserverCb: true,
       isListeningScroll: false,
       isHovering: false,
@@ -44,8 +45,8 @@ export function useFixedHeader(
    // Utils
 
    function getRoot() {
-      const root = unref(config.root)
-      if (root != null) return root
+      const _root = root()
+      if (_root != null) return _root
 
       return document.documentElement
    }
@@ -86,24 +87,24 @@ export function useFixedHeader(
     */
    function onScrollRestoration() {
       requestAnimationFrame(() => {
-         if (!internals.isMount || !isFixed()) return
+         if (!internal.isMount || !isFixed()) return
 
          const isInstant = getScrollTop() > getHeaderHeight() * 1.2 // Resolves to false if scroll is smooth
 
          if (isInstant) {
             setStyles({
                transform: leaveStyles.transform,
-               ...(config.transitionOpacity ? { opacity: 0 } : {}),
+               ...(transitionOpacity() ? { opacity: 0 } : {}),
                visibility: 'hidden',
             })
          } else {
             setStyles({
                transform: enterStyles.transform,
-               ...(config.transitionOpacity ? { opacity: 1 } : {}),
+               ...(transitionOpacity() ? { opacity: 1 } : {}),
             })
          }
 
-         internals.isMount = false
+         internal.isMount = false
       })
    }
 
@@ -113,13 +114,13 @@ export function useFixedHeader(
     * turns from fixed/sticky to something else and vice-versa.
     */
    function addResizeObserver() {
-      resizeObserver = new ResizeObserver(() => {
-         if (internals.skipInitialObserverCb) return (internals.skipInitialObserverCb = false)
+      internal.resizeObserver = new ResizeObserver(() => {
+         if (internal.skipInitialObserverCb) return (internal.skipInitialObserverCb = false)
          toggleListeners()
       })
 
       const root = getRoot()
-      if (root) resizeObserver.observe(root)
+      if (root) internal.resizeObserver.observe(root)
    }
 
    function onVisible() {
@@ -129,7 +130,7 @@ export function useFixedHeader(
 
       setStyles({
          ...enterStyles,
-         ...(config.transitionOpacity ? { opacity: 1 } : {}),
+         ...(transitionOpacity() ? { opacity: 1 } : {}),
          visibility: '' as CSS['visibility'],
       })
 
@@ -139,7 +140,7 @@ export function useFixedHeader(
    function onHidden() {
       if (state.value === State.LEAVE) return
 
-      setStyles({ ...leaveStyles, ...(config.transitionOpacity ? { opacity: 0 } : {}) })
+      setStyles({ ...leaveStyles, ...(transitionOpacity() ? { opacity: 0 } : {}) })
 
       setState(State.LEAVE)
 
@@ -198,7 +199,7 @@ export function useFixedHeader(
          if (isTopReached) return onVisible()
          if (step < 10) return
 
-         if (!internals.isHovering) {
+         if (!internal.isHovering) {
             if (isScrollingUp) {
                onVisible()
             } else if (isScrollingDown) {
@@ -219,7 +220,7 @@ export function useFixedHeader(
       const scrollRoot = root === document.documentElement ? document : root
 
       scrollRoot.addEventListener('scroll', onScroll, { passive: true })
-      internals.isListeningScroll = true
+      internal.isListeningScroll = true
    }
 
    function removeScrollListener() {
@@ -229,13 +230,13 @@ export function useFixedHeader(
       const scrollRoot = root === document.documentElement ? document : root
 
       scrollRoot.removeEventListener('scroll', onScroll)
-      internals.isListeningScroll = false
+      internal.isListeningScroll = false
    }
 
    // Pointer Events
 
    function onPointerMove(e: PointerEvent) {
-      internals.isHovering = unref(target)?.contains(e.target as Node) ?? false
+      internal.isHovering = unref(target)?.contains(e.target as Node) ?? false
    }
 
    function addPointerListener() {
@@ -251,7 +252,7 @@ export function useFixedHeader(
    function toggleListeners() {
       const isValid = isFixed()
 
-      if (internals.isListeningScroll) {
+      if (internal.isListeningScroll) {
          // If the header is not anymore fixed or sticky
          if (!isValid) {
             removeListeners()
@@ -272,7 +273,7 @@ export function useFixedHeader(
    }
 
    watch(
-      () => [unref(target), unref(config.root), isReduced.value, config.watch],
+      () => [unref(target), getRoot(), isReduced.value, unref(options.watch)],
       ([headerEl, rootEl, isReduced], _, onCleanup) => {
          const shouldInit = !isReduced && !isSSR && headerEl && (rootEl || rootEl === null)
 
@@ -284,7 +285,7 @@ export function useFixedHeader(
 
          onCleanup(() => {
             removeListeners()
-            resizeObserver?.disconnect()
+            internal.resizeObserver?.disconnect()
             removeStyles()
          })
       },

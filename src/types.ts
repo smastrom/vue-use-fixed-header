@@ -4,8 +4,7 @@ export type MaybeTemplateRef = HTMLElement | null | Ref<HTMLElement | null>
 
 export interface UseFixedHeaderOptions<T = any> {
    /**
-    * Scrolling container, defaults to `document.documentElement`
-    * when `null`.
+    * Scrolling container. Matches `document.documentElement` if `null`.
     *
     * @default null
     */
