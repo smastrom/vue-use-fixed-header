@@ -3,20 +3,20 @@ import {
    VIEWPORT_HEADER_HIDDEN as HIDDEN,
 } from '../cypress/support/constants'
 
-import { defaultOptions } from '../src/constants'
+import { TRANSITION_STYLES } from '../src/constants'
 
 const ITERATIONS = 10
 const FIXED = RELATIVE * 2
 
 describe('Functionalies are disabled', () => {
    it('Resizing from `position: fixed` to `position: relative`', () => {
-      cy.mountApp().resizeRoot(FIXED)
+      cy.mountApp()
 
       for (let i = 0; i < ITERATIONS; i++) {
-         cy.resizeRoot(FIXED).wait(100).resizeRoot(RELATIVE).wait(100)
+         cy.resizeRoot(FIXED).resizeRoot(RELATIVE)
       }
 
-      cy.getScrollSubject().scrollToHide()
+      cy.scrollDown()
       cy.get('header')
          .invoke('attr', 'style')
          .then((style) => {
@@ -28,10 +28,10 @@ describe('Functionalies are disabled', () => {
       cy.mountApp().resizeRoot(HIDDEN)
 
       for (let i = 0; i < ITERATIONS; i++) {
-         cy.resizeRoot(FIXED).wait(100).resizeRoot(HIDDEN).wait(100)
+         cy.resizeRoot(FIXED).resizeRoot(HIDDEN)
       }
 
-      cy.getScrollSubject().scrollToHide()
+      cy.scrollDown()
       cy.get('header')
          .invoke('attr', 'style')
          .then((style) => {
@@ -42,24 +42,24 @@ describe('Functionalies are disabled', () => {
 
 describe('Functionalies are enabled', () => {
    it('Resizing from `position: relative` to `position: fixed`', () => {
-      cy.mountApp().resizeRoot(RELATIVE)
+      cy.mountApp()
 
       for (let i = 0; i < ITERATIONS; i++) {
-         cy.resizeRoot(RELATIVE).wait(100).resizeRoot(FIXED).wait(100)
+         cy.resizeRoot(RELATIVE).resizeRoot(FIXED)
       }
 
-      cy.getScrollSubject().scrollToHide()
-      cy.get('header').checkStyles(defaultOptions.leaveStyles)
+      cy.scrollDown()
+      cy.get('header').should('be.hidden').checkStyles(TRANSITION_STYLES.leaveStyles)
    })
 
    it('Resizing from `display: none` to `position: fixed`', () => {
-      cy.mountApp().resizeRoot(HIDDEN)
+      cy.mountApp()
 
       for (let i = 0; i < ITERATIONS; i++) {
-         cy.resizeRoot(HIDDEN).wait(100).resizeRoot(FIXED).wait(100)
+         cy.resizeRoot(HIDDEN).resizeRoot(FIXED)
       }
 
-      cy.getScrollSubject().scrollToHide()
-      cy.get('header').checkStyles(defaultOptions.leaveStyles)
+      cy.scrollDown()
+      cy.get('header').should('be.hidden').checkStyles(TRANSITION_STYLES.leaveStyles)
    })
 })

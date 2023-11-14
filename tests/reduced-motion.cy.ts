@@ -7,12 +7,11 @@ describe('prefers-reduced-motion', () => {
 
    it('Shold not add transition', () => {
       cy.mountApp()
-         .scrollToHide()
+         .getScrollSubject()
          .get('header')
-         .should('have.css', 'transition', 'none 0s ease 0s')
-
-         .scrollToShow()
+         .should('have.css', 'transition', 'all 0s ease 0s')
+         .scrollUp()
          .get('header')
-         .should('have.css', 'transition', 'none 0s ease 0s')
+         .should('have.css', 'transition', 'all 0s ease 0s')
    })
 })

@@ -1,10 +1,8 @@
-import { DEFAULT_ENTER_DELTA } from '../src/constants'
-
 function testIstantRestoration() {
    return cy
       .mountApp({
          props: {
-            simulateInstantRestoration: true,
+            instantScrollRestoration: true,
          },
       })
       .get('header')
@@ -12,12 +10,7 @@ function testIstantRestoration() {
 }
 
 function testSmoothRestoration() {
-   return cy
-      .mountApp()
-      .getScrollSubject()
-      .scrollRootWithDelta({ delta: DEFAULT_ENTER_DELTA })
-      .get('header')
-      .should('not.be.visible')
+   return cy.mountApp().scrollDown().get('header').should('not.be.visible')
 }
 
 describe('Page load', () => {
@@ -32,11 +25,11 @@ describe('Page load', () => {
 
    describe('Header is visible if scrolling up after scroll-restoration', () => {
       it('Instant scroll', () => {
-         testIstantRestoration().scrollToShow().get('header').should('be.visible')
+         testIstantRestoration().scrollUp().get('header').should('be.visible')
       })
 
       it('Smooth scroll', () => {
-         testSmoothRestoration().scrollToShow().get('header').should('be.visible')
+         testSmoothRestoration().scrollUp().get('header').should('be.visible')
       })
    })
 })
