@@ -2,7 +2,6 @@ import { defineConfig } from 'vite'
 
 import vue from '@vitejs/plugin-vue'
 import dts from 'vite-plugin-dts'
-import terser from '@rollup/plugin-terser'
 
 export default defineConfig(({ mode }) => {
    if (mode === 'demo') return { plugins: [vue()] }
@@ -22,19 +21,13 @@ export default defineConfig(({ mode }) => {
                   vue: 'Vue',
                },
             },
-            plugins: [
-               terser({
-                  compress: {
-                     drop_console: true,
-                     defaults: true,
-                  },
-               }),
-            ],
          },
+      },
+      esbuild: {
+         drop: ['console'],
       },
       plugins: [
          dts({
-            include: ['src'],
             rollupTypes: true,
          }),
          vue(),
