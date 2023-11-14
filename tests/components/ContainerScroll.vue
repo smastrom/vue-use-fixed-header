@@ -1,20 +1,16 @@
 <script setup lang="ts">
-import { onBeforeMount, ref, type CSSProperties } from 'vue'
+import { onBeforeMount, ref } from 'vue'
 import { useFixedHeader } from '../../src'
 
 const props = defineProps<{
-   enterDelta?: number
-   leaveDelta?: number
-   enterStyles?: CSSProperties
-   leaveStyles?: CSSProperties
-   simulateInstantRestoration?: boolean
+   instantScrollRestoration?: boolean
 }>()
 
 const containerRef = ref<HTMLElement | null>(null)
 const headerRef = ref<HTMLElement | null>(null)
 
 onBeforeMount(() => {
-   if (!props.simulateInstantRestoration) return
+   if (!props.instantScrollRestoration) return
 
    window.requestAnimationFrame(() => {
       if (!containerRef.value) throw new Error('containerRef is null')
@@ -25,10 +21,6 @@ onBeforeMount(() => {
 
 const { styles } = useFixedHeader(headerRef, {
    root: containerRef,
-   enterDelta: props.enterDelta,
-   leaveDelta: props.leaveDelta,
-   enterStyles: props.enterStyles,
-   leaveStyles: props.leaveStyles,
 })
 </script>
 
