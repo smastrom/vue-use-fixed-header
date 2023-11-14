@@ -12,12 +12,11 @@ Turn your boring fixed header into a smart one with three lines of code.
 
 ## Features
 
--  **Dead simple** - Write three lines of code and you're done.
--  **Enjoyable defaults** - When scrolling down, the header is hidden, when scrolling up, the header is shown.
--  **Powerful** - Uses acceleration delta (scroll speed) for both hiding and showing instead of fixed thresholds.
--  **Intuitive** - Behaves as expected on page load, scroll restoration, hovering, dropdown navigation, top-reached and reduced motion.
--  **Smart** - Functionalities are automatically enabled/disabled if your header turns from fixed/sticky to something else or it is hidden at different viewports
--  **Flexible** - Works with any scrolling container and with your own styles
+-  **Dead simple** - Write three lines of code and you're ready to go
+-  **Enjoyable** - When scrolling down, the header is hidden, when scrolling up, the header is shown.
+-  **Smart** - Behaves as expected on page load, scroll restoration, hovering, dropdown navigation, top-reached and reduced motion.
+-  **Dynamic** - Functionalities are automatically enabled/disabled if your header turns from fixed/sticky to something else or it is hidden at different viewports
+-  **Flexible** - Works with any scrolling container
 
 <br />
 
@@ -26,8 +25,6 @@ Turn your boring fixed header into a smart one with three lines of code.
 ```bash
 pnpm add vue-use-fixed-header
 ```
-
-Or:
 
 ```bash
 yarn add vue-use-fixed-header
@@ -78,9 +75,9 @@ On resize, `useFixedHeader` checks your header's `position` and `display` proper
 
 _Disabled_ means that no event listeners are attached and the returned styles match an empty object `{}`.
 
-### Different viewports
+### Media queries
 
-Hence feel free to have code like this:
+Hence feel free to have code like this, it will just work as expected:
 
 ```css
 .Header {
@@ -102,13 +99,11 @@ Hence feel free to have code like this:
 }
 ```
 
-It will just work as expected.
-
 ### Advanced scenarios
 
-Let's suppose your header in some pages is not fixed/sticky and you're using some reactive logic to style the `position` property.
+Let's suppose your header in some pages is not fixed/sticky and you're using some reactive logic to determine whether it should be or not.
 
-You can pass a reactive source to the `watch` property of `useFixedHeader` to perform a check everytime the value changes:
+You can pass a signal to the `watch` property of `useFixedHeader` to perform a check everytime the value changes:
 
 ```vue
 <script setup>
@@ -136,51 +131,40 @@ useFixedHeader(headerRef, {
 
 <br />
 
-## Customization
-
-> Default values are displayed below.
+## API
 
 ```ts
-const { styles, isEnter, isLeave } = useFixedHeader(headerRef, {
+declare function useFixedHeader(
+   target: Ref<HTMLElement | null> | HTMLElement | null
+   options?: UseFixedHeaderOptions
+): {
+   styles: Readonly<ShallowRef<CSSProperties>>
+   isEnter: ComputedRef<boolean>
+   isLeave: ComputedRef<boolean>
+}
+
+interface UseFixedHeaderOptions {
    /**
+    * Scrolling container. Matches `document.documentElement` if `null`.
     *
-    * Use `null` if content is scrolled by the window,
-    * otherwise pass a custom scrolling container template ref */
-   root: null,
+    * @default null
+    */
+   root: Ref<HTMLElement | null> | HTMLElement | null
    /**
+    * Signal without `.value` (ref or computed) to be watched
+    * for automatic behavior toggling.
     *
-    * ref or computed to watch for automatic behavior toggling */
-   watch: () => null,
+    * @default null
+    */
+   watch: Ref<T> | ComputedRef<T>
    /**
+    * Whether to transition `opacity` propert from 0 to 1
+    * and vice versa along with the `transform` property
     *
-    * Minimum acceleration delta required to show the header.
-    * An higher value means that the user has to scroll faster. */
-   enterDelta: 0.5,
-   /**
-    *
-    * Minimum acceleration delta required to hide the header */
-   leaveDelta: 0.15,
-   /**
-    *
-    * Whether to toggle `visibility: hidden` on leave.
-    * Set this to `false` if you want to keep the header
-    * visible. */
-   toggleVisibility: true,
-   /**
-    *
-    * Custom styles applied when scrolling up */
-   enterStyles: {
-      transition: `transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)`,
-      transform: 'translateY(0px)',
-   },
-   /**
-    *
-    * Custom styles applied when scrolling down */
-   leaveStyles: {
-      transition: `transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)`,
-      transform: 'translateY(-101%)',
-   },
-})
+    * @default false
+    */
+   transitionOpacity: Ref<boolean> | boolean
+}
 ```
 
 <br />
