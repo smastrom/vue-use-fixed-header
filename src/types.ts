@@ -1,37 +1,27 @@
-import type { Ref, ComputedRef, CSSProperties, ShallowRef } from 'vue'
+import type { Ref, ComputedRef } from 'vue'
 
 export type MaybeTemplateRef = HTMLElement | null | Ref<HTMLElement | null>
 
 export interface UseFixedHeaderOptions<T = any> {
    /**
-    * Use `null` if content is scrolled by the window (default),
-    * otherwise pass a custom scrolling container template ref */
-   root?: MaybeTemplateRef
-   /**
-    * Whether to toggle `visibility: hidden` on leave.
-    * Set this to `false` if you want to keep the header
-    * visible.
+    * Scrolling container, defaults to `document.documentElement`
+    * when `null`.
+    *
+    * @default null
     */
-   toggleVisibility?: boolean
+   root: MaybeTemplateRef
    /**
-    * ref or computed to watch for automatic behavior toggling */
-   watch?: Ref<T> | ComputedRef<T>
+    * Signal without `.value` (ref or computed) to be watched
+    * for automatic behavior toggling.
+    *
+    * @default null
+    */
+   watch: Ref<T> | ComputedRef<T>
    /**
-    * Minimum acceleration delta required to hide the header */
-   leaveDelta?: number
-   /**
-    * Minimum acceleration delta required to show the header */
-   enterDelta?: number
-   /**
-    * Custom enter transition styles */
-   enterStyles?: CSSProperties
-   /**
-    * Custom leave transition styles */
-   leaveStyles?: CSSProperties
-}
-
-export interface UseFixedHeaderReturn {
-   styles: ShallowRef<CSSProperties>
-   isLeave: ComputedRef<boolean>
-   isEnter: ComputedRef<boolean>
+    * Whether to transition `opacity` propert from 0 to 1
+    * and vice versa along with the `transform` property
+    *
+    * @default false
+    */
+   transitionOpacity: boolean
 }

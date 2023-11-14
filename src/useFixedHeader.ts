@@ -1,18 +1,9 @@
-import {
-   onBeforeUnmount,
-   shallowRef,
-   ref,
-   unref,
-   watch,
-   computed,
-   readonly,
-   type CSSProperties as CSS,
-} from 'vue'
+import { shallowRef, ref, unref, watch, computed, readonly, type CSSProperties as CSS } from 'vue'
 
-import { mergeDefined, isSSR, isReducedMotion } from './utils'
-import { CAPTURE_DELTA_FRAME_COUNT, defaultOptions } from './constants'
+import { isSSR, useReducedMotion } from './utils'
+import { defaultOptions, TRANSITION_STYLES } from './constants'
 
-import type { UseFixedHeaderOptions, MaybeTemplateRef, UseFixedHeaderReturn } from './types'
+import type { UseFixedHeaderOptions, MaybeTemplateRef } from './types'
 
 enum State {
    READY,
@@ -22,36 +13,38 @@ enum State {
 
 export function useFixedHeader(
    target: MaybeTemplateRef,
-   options: UseFixedHeaderOptions = defaultOptions,
-): UseFixedHeaderReturn {
-   const mergedOptions = mergeDefined(defaultOptions, options)
+   options: Partial<UseFixedHeaderOptions> = {},
+) {
+   // Config
+
+   const config = { ...defaultOptions, ...options }
+
+   const { enterStyles, leaveStyles } = TRANSITION_STYLES
 
    let resizeObserver: ResizeObserver | undefined = undefined
 
-   let isListeningScroll = false
-   let isHovering = false
+   const isReduced = useReducedMotion()
 
    // Internal state
+
+   const internals = {
+      skipInitialObserverCb: true,
+      isListeningScroll: false,
+      isHovering: false,
+      isMount: true,
+   }
 
    const styles = shallowRef<CSS>({})
    const state = ref<State>(State.READY)
 
-   function setStyles(newStyles: CSS) {
-      styles.value = newStyles
-   }
+   const setStyles = (newStyles: CSS) => (styles.value = newStyles)
+   const removeStyles = () => (styles.value = {})
+   const setState = (newState: State) => (state.value = newState)
 
-   function removeStyles() {
-      styles.value = {}
-   }
-
-   function setState(newState: State) {
-      state.value = newState
-   }
-
-   // Target utils
+   // Utils
 
    function getRoot() {
-      const root = unref(mergedOptions.root)
+      const root = unref(config.root)
       if (root != null) return root
 
       return document.documentElement
@@ -93,29 +86,46 @@ export function useFixedHeader(
     */
    function onScrollRestoration() {
       requestAnimationFrame(() => {
+         if (!internals.isMount || !isFixed()) return
+
          const isInstant = getScrollTop() > getHeaderHeight() * 1.2 // Resolves to false if scroll is smooth
 
          if (isInstant) {
             setStyles({
-               ...mergedOptions.leaveStyles,
-               ...(mergedOptions.toggleVisibility ? { visibility: 'hidden' } : {}),
-               transition: '', // We don't want transitions to play on page load...
+               transform: leaveStyles.transform,
+               visibility: 'hidden',
             })
          } else {
-            setStyles({ ...mergedOptions.enterStyles, transition: '' }) //...same here
+            setStyles({ transform: enterStyles.transform })
          }
+
+         internals.isMount = false
       })
+   }
+
+   /**
+    * Resize observer is added wheter or not the header is fixed/sticky
+    * as it is in charge of toggling scroll/pointer listeners if it
+    * turns from fixed/sticky to something else and vice-versa.
+    */
+   function addResizeObserver() {
+      resizeObserver = new ResizeObserver(() => {
+         if (internals.skipInitialObserverCb) return (internals.skipInitialObserverCb = false)
+         toggleListeners()
+      })
+
+      const root = getRoot()
+      if (root) resizeObserver.observe(root)
    }
 
    function onVisible() {
       if (state.value === State.ENTER) return
 
-      toggleTransitionListener(true)
+      removeTransitionListener()
 
       setStyles({
-         ...mergedOptions.enterStyles,
-         ...(mergedOptions.toggleVisibility ? { visibility: '' as CSS['visibility'] } : {}),
-         ...(isReducedMotion() ? { transition: 'none' } : {}),
+         ...enterStyles,
+         visibility: '' as CSS['visibility'],
       })
 
       setState(State.ENTER)
@@ -124,97 +134,70 @@ export function useFixedHeader(
    function onHidden() {
       if (state.value === State.LEAVE) return
 
-      setStyles({
-         ...mergedOptions.leaveStyles,
-         ...(isReducedMotion() ? { transition: 'none' } : {}),
-      })
+      setStyles(leaveStyles)
 
       setState(State.LEAVE)
-      toggleTransitionListener()
+
+      addTransitionListener()
    }
 
-   // Transition
+   // Transition Events
 
    function onTransitionEnd(e: TransitionEvent) {
-      toggleTransitionListener(true)
+      removeTransitionListener()
 
-      if (e.target !== unref(target)) return
+      if (!unref(target) || e.target !== unref(target)) return
+
+      /**
+       * In some edge cases this might be called when the header
+       * is visible, so we need to check the transform value.
+       */
+      const { transform } = window.getComputedStyle(unref(target)!)
+      // console.log('transform@transitionEnd', transform)
+      if (transform === 'matrix(1, 0, 0, 1, 0, 0)') return // translateY(0px)
 
       setStyles({
-         ...mergedOptions.leaveStyles,
-         ...(mergedOptions.toggleVisibility ? { visibility: 'hidden' } : {}),
+         ...leaveStyles,
+         visibility: 'hidden',
       })
    }
 
-   function toggleTransitionListener(isRemove = false) {
+   function addTransitionListener() {
       const el = unref(target)
       if (!el) return
 
-      const method = isRemove ? 'removeEventListener' : ('addEventListener' as const)
-      el[method]('transitionend', onTransitionEnd as EventListener)
+      el.addEventListener('transitionend', onTransitionEnd as EventListener)
    }
 
-   // Scroll
+   function removeTransitionListener() {
+      const el = unref(target)
+      if (!el) return
+
+      el.removeEventListener('transitionend', onTransitionEnd as EventListener)
+   }
+
+   // Scroll Events
 
    function createScrollHandler() {
-      let captureEnterDelta = true
-      let captureLeaveDelta = true
-
       let prevTop = 0
 
-      function captureDelta(onCaptured: (value: number) => void) {
-         let rafId: DOMHighResTimeStamp | undefined = undefined
-         let frameCount = 0
-
-         const startMs = performance.now()
-         const startY = getScrollTop()
-
-         function rafDelta() {
-            const nextY = getScrollTop()
-
-            if (frameCount === CAPTURE_DELTA_FRAME_COUNT) {
-               onCaptured(Math.abs(startY - nextY) / (performance.now() - startMs))
-               cancelAnimationFrame(rafId as DOMHighResTimeStamp)
-            } else {
-               frameCount++
-               requestAnimationFrame(rafDelta)
-            }
-         }
-
-         rafId = requestAnimationFrame(rafDelta)
-      }
-
       return () => {
-         const isTopReached = getScrollTop() <= getHeaderHeight()
+         const scrollTop = getScrollTop()
 
-         const isScrollingUp = getScrollTop() < prevTop
-         const isScrollingDown = getScrollTop() > prevTop
+         const isTopReached = scrollTop <= getHeaderHeight()
+         const isScrollingUp = scrollTop < prevTop
+         const isScrollingDown = scrollTop > prevTop
 
-         if (isTopReached) {
-            onVisible()
-         } else {
-            if (!isHovering && prevTop > 0) {
-               if (isScrollingUp && captureEnterDelta) {
-                  captureEnterDelta = false
+         const step = Math.abs(scrollTop - prevTop)
 
-                  captureDelta((value) => {
-                     if (value >= mergedOptions.enterDelta) {
-                        onVisible()
-                     }
+         if (isTopReached) return onVisible()
+         if (step < 10) return
 
-                     captureEnterDelta = true
-                  })
-               } else if (isScrollingDown && captureLeaveDelta) {
-                  captureLeaveDelta = false
-
-                  captureDelta((value) => {
-                     if (value >= mergedOptions.leaveDelta) {
-                        onHidden()
-                     }
-
-                     captureLeaveDelta = true
-                  })
-               }
+         if (!internals.isHovering) {
+            if (isScrollingUp) {
+               onVisible()
+            } else if (isScrollingDown) {
+               onHidden()
             }
          }
 
@@ -224,41 +207,46 @@ export function useFixedHeader(
 
    const onScroll = createScrollHandler()
 
-   function toggleScroll(isRemove = false) {
+   function addScrollListener() {
       const root = getRoot()
       if (!root) return
 
       const scrollRoot = root === document.documentElement ? document : root
-      const method = isRemove ? 'removeEventListener' : 'addEventListener'
 
-      scrollRoot[method]('scroll', onScroll, { passive: true })
-
-      isListeningScroll = !isRemove
+      scrollRoot.addEventListener('scroll', onScroll, { passive: true })
+      internals.isListeningScroll = true
    }
 
-   // Pointer
+   function removeScrollListener() {
+      const root = getRoot()
+      if (!root) return
 
-   function setPointer(e: PointerEvent) {
-      isHovering = unref(target)?.contains(e.target as Node) ?? false
+      const scrollRoot = root === document.documentElement ? document : root
+
+      scrollRoot.removeEventListener('scroll', onScroll)
+      internals.isListeningScroll = false
    }
 
-   function togglePointer(isRemove = false) {
-      const method = isRemove ? 'removeEventListener' : 'addEventListener'
+   // Pointer Events
 
-      document[method]('pointermove', setPointer as EventListener)
+   function onPointerMove(e: PointerEvent) {
+      internals.isHovering = unref(target)?.contains(e.target as Node) ?? false
+   }
+
+   function addPointerListener() {
+      document.addEventListener('pointermove', onPointerMove)
+   }
+
+   function removePointerListener() {
+      document.removeEventListener('pointermove', onPointerMove)
    }
 
    // Listeners
 
-   function removeListeners() {
-      toggleScroll(true)
-      togglePointer(true)
-   }
-
    function toggleListeners() {
       const isValid = isFixed()
 
-      if (isListeningScroll) {
+      if (internals.isListeningScroll) {
          // If the header is not anymore fixed or sticky
          if (!isValid) {
             removeListeners()
@@ -267,65 +255,36 @@ export function useFixedHeader(
          // If was not listening and now is fixed or sticky
       } else {
          if (isValid) {
-            toggleScroll()
-            togglePointer()
+            addScrollListener()
+            addPointerListener()
          }
       }
    }
 
-   function _onCleanup() {
-      removeListeners()
-      resizeObserver?.disconnect()
+   function removeListeners() {
+      removeScrollListener()
+      removePointerListener()
    }
 
-   // Resize observer
-
-   let skipInitial = true
-
-   function addResizeObserver() {
-      resizeObserver = new ResizeObserver(() => {
-         if (skipInitial) return (skipInitial = false)
-         toggleListeners()
-      })
-
-      const root = getRoot()
-      if (root) resizeObserver.observe(root)
-   }
-
-   // Watchers
-
-   /**
-    * Using this instead of 'onMounted' allows to toggle resize
-    * observer and scroll listener also in case the header is
-    * somehow removed from the DOM and the parent component that
-    * calls `useFixedHeader` is not unmounted.
-    */
    watch(
-      () => [unref(target), unref(mergedOptions.root)],
-      ([targetEl, rootEl], _, onCleanup) => {
-         const shouldInit = !isSSR && targetEl && (rootEl || rootEl === null)
+      () => [unref(target), unref(config.root), isReduced.value, config.watch],
+      ([headerEl, rootEl, isReduced], _, onCleanup) => {
+         const shouldInit = !isReduced && !isSSR && headerEl && (rootEl || rootEl === null)
 
          if (shouldInit) {
-            /**
-             * Resize observer is added in any case as it is
-             * in charge of toggling scroll/pointer listeners if the header
-             * turns from fixed/sticky to something else and vice-versa.
-             */
             addResizeObserver()
-            if (!isFixed()) return
-
             onScrollRestoration()
             toggleListeners()
          }
 
-         onCleanup(_onCleanup)
+         onCleanup(() => {
+            removeListeners()
+            resizeObserver?.disconnect()
+            removeStyles()
+         })
       },
       { immediate: true, flush: 'post' },
    )
-
-   watch(mergedOptions.watch, toggleListeners, { flush: 'post' })
-
-   onBeforeUnmount(_onCleanup)
 
    return {
       styles: readonly(styles),

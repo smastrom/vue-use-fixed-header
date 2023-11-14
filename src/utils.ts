@@ -1,19 +1,22 @@
-export function mergeDefined<T>(defaults: Required<T>, options: T): Required<T> {
-   const result = { ...defaults }
-
-   for (const key in options) {
-      if (typeof options[key] !== 'undefined') {
-         result[key] = options[key]
-      }
-   }
-
-   return result as Required<T>
-}
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 
 export const isSSR = typeof window === 'undefined'
 
-export function isReducedMotion() {
-   if (isSSR) return false
+export function useReducedMotion() {
+   const isReduced = ref(false)
 
-   return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+   const query = window.matchMedia('(prefers-reduced-motion: reduce)')
+
+   const onMatch = () => (isReduced.value = query.matches)
+
+   onMounted(() => {
+      onMatch()
+      query.addEventListener?.('change', onMatch)
+   })
+
+   onBeforeUnmount(() => {
+      query.removeEventListener?.('change', onMatch)
+   })
+
+   return isReduced
 }
