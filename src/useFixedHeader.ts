@@ -13,7 +13,7 @@ enum State {
 
 export function useFixedHeader(
    target: MaybeTemplateRef,
-   options: Partial<UseFixedHeaderOptions> = {},
+   options: Partial<UseFixedHeaderOptions> = {}
 ) {
    // Config
 
@@ -152,14 +152,13 @@ export function useFixedHeader(
    function onTransitionEnd(e: TransitionEvent) {
       removeTransitionListener()
 
-      if (!unref(target) || e.target !== unref(target)) return
+      if (!unref(target) || e.target !== unref(target) || e.propertyName !== 'transform') return
 
       /**
        * In some edge cases this might be called when the header
        * is visible, so we need to check the transform value.
        */
       const { transform } = window.getComputedStyle(unref(target)!)
-      // console.log('transform@transitionEnd', transform)
       if (transform === 'matrix(1, 0, 0, 1, 0, 0)') return // translateY(0px)
 
       setStyles({
@@ -289,7 +288,7 @@ export function useFixedHeader(
             removeStyles()
          })
       },
-      { immediate: true, flush: 'post' },
+      { immediate: true, flush: 'post' }
    )
 
    return {

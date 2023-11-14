@@ -20,9 +20,6 @@ devDependencies:
   cypress-wait-frames:
     specifier: ^0.9.4
     version: 0.9.4
-  playwright-webkit:
-    specifier: ~1.39.0
-    version: 1.39.0
   typescript:
     specifier: ^5.2.2
     version: 5.2.2
@@ -1571,21 +1568,6 @@ packages:
   /pify@2.3.0:
     resolution: {integrity: sha512-udgsAY+fTnvv7kI7aaxbqwWNb0AHiB0qBO89PZKPkoTmGOgdbrHDKD+0B2X4uTfJ/FT1R09r9gTsjUjNJotuog==}
     engines: {node: '>=0.10.0'}
-    dev: true
-
-  /playwright-core@1.39.0:
-    resolution: {integrity: sha512-+k4pdZgs1qiM+OUkSjx96YiKsXsmb59evFoqv8SKO067qBA+Z2s/dCzJij/ZhdQcs2zlTAgRKfeiiLm8PQ2qvw==}
-    engines: {node: '>=16'}
-    hasBin: true
-    dev: true
-
-  /playwright-webkit@1.39.0:
-    resolution: {integrity: sha512-w6ItPfhYgjwbmFUi1tLozf4rsuD43Y1KoWWRU1qRahWeOyFGa5GWLWd2+e5dSpk5gx27XUcLpc56s1exhUrcLQ==}
-    engines: {node: '>=16'}
-    hasBin: true
-    requiresBuild: true
-    dependencies:
-      playwright-core: 1.39.0
     dev: true
 
   /postcss@8.4.31:

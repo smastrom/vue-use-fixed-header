@@ -49,10 +49,8 @@
       "test": "pnpm run test:chrome && pnpm run test:firefox && pnpm run test:container:chrome && pnpm run test:container:firefox",
       "test:chrome": "cypress run --component --browser chrome",
       "test:firefox": "cypress run --component --browser firefox",
-      "test:webkit": "cypress run --component --browser webkit",
       "test:container:chrome": "cypress run --component --browser chrome --env CONTAINER=\"custom\"",
       "test:container:firefox": "cypress run --component --browser firefox --env CONTAINER=\"custom\"",
-      "test:container:webkit": "cypress run --component --browser webkit --env CONTAINER=\"custom\"",
       "test:gui": "cypress open --component",
       "test:gui:container": "cypress open --component --env CONTAINER=\"custom\""
    },
@@ -62,7 +60,6 @@
       "cypress": "^13.5.1",
       "cypress-real-events": "^1.11.0",
       "cypress-wait-frames": "^0.9.4",
-      "playwright-webkit": "~1.39.0",
       "typescript": "^5.2.2",
       "vite": "^4.5.0",
       "vite-plugin-dts": "^3.6.3",

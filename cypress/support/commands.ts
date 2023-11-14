@@ -45,16 +45,11 @@ Cypress.Commands.add('resizeRoot', (newWidth: number) => {
 Cypress.Commands.add('scrollUp', () => cy.getScrollSubject().scrollTo('top', { duration: 300 }))
 
 Cypress.Commands.add('scrollDown', () =>
-   cy.getScrollSubject().scrollTo('bottom', { duration: 300 }),
+   cy.getScrollSubject().scrollTo('bottom', { duration: 300 })
 )
 
 Cypress.Commands.add('checkStyles', { prevSubject: 'element' }, (subject, styles) => {
    Object.entries(styles).forEach(([property, value]) => {
-      // Webkit removes the 0s delay specified in our styles
-      if (Cypress.isBrowser('webkit') && property === 'transition') {
-         value = value.replaceAll(' 0s', '')
-      }
-
       cy.wrap(subject).should('have.attr', 'style').and('include', `${property}: ${value}`)
    })
 })
