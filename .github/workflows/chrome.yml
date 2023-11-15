@@ -21,6 +21,6 @@ jobs:
          - name: Install dependencies
            run: pnpm install
          - name: Window scroll
-           run: pnpm run test:chrome
+           run: pnpm -C packages/vue-use-fixed-header run test:chrome
          - name: Custom scrolling container
-           run: pnpm run test:container:chrome
+           run: pnpm -C packages/vue-use-fixed-header test:container:chrome

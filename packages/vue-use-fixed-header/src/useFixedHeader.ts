@@ -276,25 +276,26 @@ export function useFixedHeader(
       removePointerListener()
    }
 
-   watch(
-      () => [unref(target), getRoot(), isReduced.value, unref(options.watch)],
-      ([headerEl, rootEl, isReduced], _, onCleanup) => {
-         const shouldInit = !isReduced && !isSSR && headerEl && (rootEl || rootEl === null)
+   !isSSR &&
+      watch(
+         () => [unref(target), getRoot(), isReduced.value, unref(options.watch)],
+         ([headerEl, rootEl, isReduced], _, onCleanup) => {
+            const shouldInit = !isReduced && !isSSR && headerEl && (rootEl || rootEl === null)
 
-         if (shouldInit) {
-            addResizeObserver()
-            onScrollRestoration()
-            toggleListeners()
-         }
+            if (shouldInit) {
+               addResizeObserver()
+               onScrollRestoration()
+               toggleListeners()
+            }
 
-         onCleanup(() => {
-            removeListeners()
-            internal.resizeObserver?.disconnect()
-            removeStyles()
-         })
-      },
-      { immediate: true, flush: 'post' },
-   )
+            onCleanup(() => {
+               removeListeners()
+               internal.resizeObserver?.disconnect()
+               removeStyles()
+            })
+         },
+         { immediate: true, flush: 'post' },
+      )
 
    return {
       styles: readonly(styles),

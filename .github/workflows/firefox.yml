@@ -19,6 +19,6 @@ jobs:
          - name: Install dependencies
            run: pnpm install
          - name: Window scroll
-           run: pnpm run test:firefox
+           run: pnpm -C packages/vue-use-fixed-header run test:firefox
          - name: Custom scrolling container
-           run: pnpm run test:container:firefox
+           run: pnpm -C packages/vue-use-fixed-header test:container:firefox
