@@ -280,7 +280,7 @@ export function useFixedHeader(
       watch(
          () => [unref(target), getRoot(), isReduced.value, unref(options.watch)],
          ([headerEl, rootEl, isReduced], _, onCleanup) => {
-            const shouldInit = !isReduced && !isSSR && headerEl && (rootEl || rootEl === null)
+            const shouldInit = !isReduced && headerEl && (rootEl || rootEl === null)
 
             if (shouldInit) {
                addResizeObserver()

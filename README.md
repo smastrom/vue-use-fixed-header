@@ -6,7 +6,7 @@ Turn your boring fixed header into a smart one with three lines of code.
 
 <br />
 
-**Demo:** [Website](https://vue-use-fixed-header.netlify.app/) — **Examples:** [Vue 3](https://stackblitz.com/edit/vitejs-vite-nc7ey2?file=index.html,src%2Fcomponents%2FPage.vue) - [Nuxt 3](https://stackblitz.com/edit/nuxt-starter-zbtjes?file=layouts%2Fdefault.vue)
+**Demo:** [Website](https://vue-use-fixed-header.pages.dev/) — **Examples:** [Vue 3](https://stackblitz.com/edit/vitejs-vite-nc7ey2?file=index.html,src%2Fcomponents%2FPage.vue) - [Nuxt 3](https://stackblitz.com/edit/nuxt-starter-zbtjes?file=layouts%2Fdefault.vue)
 
 <br />
 

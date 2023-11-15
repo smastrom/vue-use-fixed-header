@@ -5,5 +5,8 @@ export default defineNuxtConfig({
    app: {
       head: getHead(),
    },
+   nitro: {
+      preset: 'cloudflare-pages',
+   },
    css: ['@/assets/global.css'],
 })

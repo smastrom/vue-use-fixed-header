@@ -37,7 +37,7 @@ export function getHead() {
          {
             hid: 'og:url',
             property: 'og:url',
-            content: 'https://vue-use-fixed-header.netlify.app',
+            content: 'https://vue-use-fixed-header.pages.dev',
          },
          {
             hid: 'twitter:title',
