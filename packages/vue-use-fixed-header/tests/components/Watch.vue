@@ -41,4 +41,3 @@ const position = computed(() => (props.watch.value ? 'relative' : 'fixed'))
    background: red;
 }
 </style>
-../../src/useFixedHeader

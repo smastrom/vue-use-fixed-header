@@ -1,11 +1,11 @@
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 
-export const isSSR = typeof window === 'undefined'
+export const isBrowser = typeof window !== 'undefined'
 
 export function useReducedMotion() {
    const isReduced = ref(false)
 
-   if (isSSR) return isReduced
+   if (!isBrowser) return isReduced
 
    const query = window.matchMedia('(prefers-reduced-motion: reduce)')
 

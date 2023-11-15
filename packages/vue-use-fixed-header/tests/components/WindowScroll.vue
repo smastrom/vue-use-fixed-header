@@ -1,20 +1,8 @@
 <script setup lang="ts">
-import { onBeforeMount, ref } from 'vue'
+import { ref } from 'vue'
 import { useFixedHeader } from '../../src'
 
-const props = defineProps<{
-   instantScrollRestoration?: boolean
-}>()
-
 const headerRef = ref<HTMLElement | null>(null)
-
-onBeforeMount(() => {
-   if (!props.instantScrollRestoration) return
-
-   window.requestAnimationFrame(() => {
-      window.scroll(0, window.innerHeight / 3)
-   })
-})
 
 const { styles } = useFixedHeader(headerRef)
 </script>

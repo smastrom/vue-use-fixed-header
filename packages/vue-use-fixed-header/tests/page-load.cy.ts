@@ -1,10 +1,8 @@
 function testIstantRestoration() {
    return cy
-      .mountApp({
-         props: {
-            instantScrollRestoration: true,
-         },
-      })
+      .mountApp()
+      .getScrollSubject()
+      .scrollTo('bottom', { duration: 0 })
       .get('header')
       .should('not.be.visible')
 }

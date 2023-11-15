@@ -1,6 +1,6 @@
 import { shallowRef, ref, unref, watch, computed, readonly, type CSSProperties as CSS } from 'vue'
 
-import { isSSR, useReducedMotion } from './utils'
+import { useReducedMotion, isBrowser } from './utils'
 import { TRANSITION_STYLES } from './constants'
 
 import type { UseFixedHeaderOptions, MaybeTemplateRef } from './types'
@@ -29,10 +29,9 @@ export function useFixedHeader(
 
    const internal = {
       resizeObserver: undefined as ResizeObserver | undefined,
-      skipInitialObserverCb: true,
+      initResizeObserver: false,
       isListeningScroll: false,
       isHovering: false,
-      isMount: true,
    }
 
    const styles = shallowRef<CSS>({})
@@ -81,46 +80,14 @@ export function useFixedHeader(
    // Callbacks
 
    /**
-    * Hides the header on page load before it has a chance to paint
-    * if scroll restoration is instant. If not, applies the enter
-    * styles immediately (without transitions).
-    */
-   function onScrollRestoration() {
-      window.requestAnimationFrame(() => {
-         if (!internal.isMount) return
-
-         if (!isFixed()) {
-            internal.isMount = false
-            return
-         }
-
-         const isInstant = getScrollTop() > getHeaderHeight() * 1.2 // Resolves to false if scroll is smooth
-
-         if (isInstant) {
-            setStyles({
-               transform: leaveStyles.transform,
-               ...(transitionOpacity() ? { opacity: 0 } : {}),
-               visibility: 'hidden',
-            })
-         } else {
-            setStyles({
-               transform: enterStyles.transform,
-               ...(transitionOpacity() ? { opacity: 1 } : {}),
-            })
-         }
-
-         internal.isMount = false
-      })
-   }
-
-   /**
     * Resize observer is added wheter or not the header is fixed/sticky
     * as it is in charge of toggling scroll/pointer listeners if it
     * turns from fixed/sticky to something else and vice-versa.
     */
    function addResizeObserver() {
       internal.resizeObserver = new ResizeObserver(() => {
-         if (internal.skipInitialObserverCb) return (internal.skipInitialObserverCb = false)
+         // Skip the initial call
+         if (!internal.initResizeObserver) return (internal.initResizeObserver = true)
          toggleListeners()
       })
 
@@ -189,7 +156,7 @@ export function useFixedHeader(
    // Scroll Events
 
    function createScrollHandler() {
-      let prevTop = 0
+      let prevTop = isBrowser ? getScrollTop() : 0
 
       return () => {
          const scrollTop = getScrollTop()
@@ -276,7 +243,7 @@ export function useFixedHeader(
       removePointerListener()
    }
 
-   !isSSR &&
+   isBrowser &&
       watch(
          () => [unref(target), getRoot(), isReduced.value, unref(options.watch)],
          ([headerEl, rootEl, isReduced], _, onCleanup) => {
@@ -284,14 +251,14 @@ export function useFixedHeader(
 
             if (shouldInit) {
                addResizeObserver()
-               onScrollRestoration()
                toggleListeners()
             }
 
             onCleanup(() => {
                removeListeners()
-               internal.resizeObserver?.disconnect()
                removeStyles()
+               internal.resizeObserver?.disconnect()
+               internal.initResizeObserver = false
             })
          },
          { immediate: true, flush: 'post' },
