@@ -1,0 +1,69 @@
+{
+   "name": "vue-use-fixed-header",
+   "description": "Turn your boring fixed header into a smart one with three lines of code.",
+   "private": false,
+   "version": "0.9.0",
+   "type": "module",
+   "keywords": [
+      "vue",
+      "vuejs",
+      "vue-3",
+      "fixed-header",
+      "use-fixed-header",
+      "vue-composable",
+      "vue-composables",
+      "nuxt-3",
+      "nuxt"
+   ],
+   "homepage": "https://vue-use-fixed-header.netlify.app/",
+   "bugs": {
+      "url": "https://github.com/smastrom/vue-use-fixed-header/issues"
+   },
+   "repository": {
+      "type": "git",
+      "url": "https://github.com/smastrom/vue-use-fixed-header.git",
+      "directory": "packages/vue-use-fixed-header"
+   },
+   "license": "MIT",
+   "author": {
+      "name": "Simone Mastromattei",
+      "email": "smastrom@proton.me"
+   },
+   "exports": {
+      ".": {
+         "import": "./dist/index.js",
+         "types": "./dist/index.d.ts"
+      }
+   },
+   "module": "dist/index.js",
+   "types": "dist/index.d.ts",
+   "files": [
+      "dist/*"
+   ],
+   "scripts": {
+      "dev": "vite",
+      "watch": "vite build --watch",
+      "prebuild": "cp ../../LICENSE ../../README.md .",
+      "build": "rm -rf dist && vue-tsc && vite build",
+      "postbuild": "pnpm pack",
+      "test": "pnpm run test:chrome && pnpm run test:firefox && pnpm run test:container:chrome && pnpm run test:container:firefox",
+      "test:chrome": "cypress run --component --browser chrome",
+      "test:firefox": "cypress run --component --browser firefox",
+      "test:container:chrome": "cypress run --component --browser chrome --env CONTAINER=\"custom\"",
+      "test:container:firefox": "cypress run --component --browser firefox --env CONTAINER=\"custom\"",
+      "test:gui": "cypress open --component",
+      "test:gui:container": "cypress open --component --env CONTAINER=\"custom\""
+   },
+   "devDependencies": {
+      "@types/node": "^20.9.0",
+      "@vitejs/plugin-vue": "^4.4.1",
+      "cypress": "^13.5.1",
+      "cypress-real-events": "^1.11.0",
+      "cypress-wait-frames": "^0.9.4",
+      "typescript": "^5.2.2",
+      "vite": "^4.5.0",
+      "vite-plugin-dts": "^3.6.3",
+      "vue": "^3.3.8",
+      "vue-tsc": "^1.8.22"
+   }
+}

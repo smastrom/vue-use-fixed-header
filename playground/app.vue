@@ -1,8 +1,3 @@
-<script setup lang="ts">
-import Header from './Header.vue'
-import WithContainer from './WithContainer.vue'
-</script>
-
 <template>
    <div>
       <Header />

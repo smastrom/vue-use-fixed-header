@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useFixedHeader } from '../src'
+import { useFixedHeader } from 'vue-use-fixed-header'
 
 const headerRef = ref<HTMLElement | null>(null)
 
@@ -167,4 +167,3 @@ const { styles } = useFixedHeader(headerRef)
    }
 }
 </style>
-../src/useFixedHeader

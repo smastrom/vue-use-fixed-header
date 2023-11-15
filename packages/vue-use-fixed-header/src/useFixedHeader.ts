@@ -13,7 +13,7 @@ enum State {
 
 export function useFixedHeader(
    target: MaybeTemplateRef,
-   options: Partial<UseFixedHeaderOptions> = {}
+   options: Partial<UseFixedHeaderOptions> = {},
 ) {
    // Config
 
@@ -62,7 +62,7 @@ export function useFixedHeader(
       const el = unref(target)
       if (!el) return false
 
-      const { position, display } = getComputedStyle(el)
+      const { position, display } = window.getComputedStyle(el)
       return (position === 'fixed' || position === 'sticky') && display !== 'none'
    }
 
@@ -72,8 +72,8 @@ export function useFixedHeader(
 
       let headerHeight = el.scrollHeight
 
-      const { marginTop, marginBottom } = getComputedStyle(el)
-      headerHeight += parseFloat(marginTop) + parseFloat(marginBottom)
+      const { marginTop, marginBottom } = window.getComputedStyle(el)
+      headerHeight += Number.parseFloat(marginTop) + Number.parseFloat(marginBottom)
 
       return headerHeight
    }
@@ -86,7 +86,7 @@ export function useFixedHeader(
     * styles immediately (without transitions).
     */
    function onScrollRestoration() {
-      requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
          if (!internal.isMount) return
 
          if (!isFixed()) {
@@ -293,7 +293,7 @@ export function useFixedHeader(
             removeStyles()
          })
       },
-      { immediate: true, flush: 'post' }
+      { immediate: true, flush: 'post' },
    )
 
    return {

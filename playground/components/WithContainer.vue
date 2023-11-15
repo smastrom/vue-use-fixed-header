@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useFixedHeader } from '../src'
+import { useFixedHeader } from 'vue-use-fixed-header'
 
 import Header from './Header.vue'
 
@@ -105,4 +105,3 @@ const { styles } = useFixedHeader(headerRef, {
    text-align: center;
 }
 </style>
-../src/useFixedHeader
