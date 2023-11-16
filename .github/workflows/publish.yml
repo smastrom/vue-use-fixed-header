@@ -1,0 +1,39 @@
+name: Publish to NPM
+
+on:
+   push:
+      tags: ['v*']
+   workflow_dispatch:
+
+jobs:
+   chrome-tests-workflow:
+      uses: ./.github/workflows/chrome-tests.yml
+   firefox-tests-workflow:
+      uses: ./.github/workflows/firefox-tests.yml
+   publish:
+      needs: [chrome-tests-workflow, firefox-tests-workflow]
+      runs-on: ubuntu-latest
+      permissions:
+         contents: read
+         id-token: write
+      steps:
+         - uses: actions/checkout@v3
+         - uses: actions/setup-node@v3
+           with:
+              node-version: '20.x'
+              registry-url: 'https://registry.npmjs.org'
+         - uses: pnpm/action-setup@v2
+           name: Install pnpm
+           with:
+              version: 8
+              run_install: true
+         - name: Build package
+           run: pnpm build
+         - name: Copy README and LICENSE
+           run: cp README.md LICENSE packages/vue-use-fixed-header
+         - name: Pack
+           run: cd packages/vue-use-fixed-header && rm -rf *.tgz && npm pack
+         - name: Publish
+           run: cd packages/vue-use-fixed-header && npm publish *.tgz --provenance --access public
+           env:
+              NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

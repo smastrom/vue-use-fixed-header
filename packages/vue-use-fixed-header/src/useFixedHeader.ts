@@ -1,4 +1,13 @@
-import { shallowRef, ref, unref, watch, computed, readonly, type CSSProperties as CSS } from 'vue'
+import {
+   shallowRef,
+   ref,
+   unref,
+   watch,
+   computed,
+   readonly,
+   type ComputedRef,
+   type CSSProperties as CSS,
+} from 'vue'
 
 import { useReducedMotion, isBrowser } from './utils'
 import { TRANSITION_STYLES } from './constants'
@@ -14,7 +23,11 @@ enum State {
 export function useFixedHeader(
    target: MaybeTemplateRef,
    options: Partial<UseFixedHeaderOptions> = {},
-) {
+): {
+   styles: Readonly<CSS>
+   isLeave: Readonly<ComputedRef<boolean>>
+   isEnter: Readonly<ComputedRef<boolean>>
+} {
    // Config
 
    const { enterStyles, leaveStyles } = TRANSITION_STYLES
