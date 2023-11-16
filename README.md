@@ -14,7 +14,7 @@ Turn your boring fixed header into a smart one with three lines of code.
 
 -  **Dead simple** - Write three lines of code and you're ready to go
 -  **Enjoyable** - When scrolling down, the header is hidden, when scrolling up, the header is shown.
--  **Smart** - Behaves as expected on page load, scroll restoration, hovering, dropdown navigation, top-reached and reduced motion.
+-  **Smart** - Behaves as expected on page load, hovering, dropdown navigation, top-reached and reduced motion.
 -  **Dynamic** - Functionalities are automatically enabled/disabled if your header turns from fixed/sticky to something else or it is hidden at different viewports
 -  **Flexible** - Works with any scrolling container
 
@@ -113,13 +113,19 @@ const headerRef = ref(null)
 
 const isPricingPage = computed(() => route.name === 'Pricing')
 
-useFixedHeader(headerRef, {
+const { styles } useFixedHeader(headerRef, {
    watch: isPricingPage, // Will perform a check everytime the value changes
 })
 </script>
 
 <template>
-   <header ref="headerRef" :style="{ position: isPricingPage ? 'relative' : 'fixed' }">
+   <header
+      ref="headerRef"
+      :style="{
+         ...styles,
+         position: isPricingPage ? 'relative' : 'fixed',
+      }"
+   >
       <!-- Your content -->
    </header>
 </template>
