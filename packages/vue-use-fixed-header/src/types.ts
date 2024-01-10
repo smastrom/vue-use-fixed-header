@@ -22,5 +22,5 @@ export interface UseFixedHeaderOptions<T = any> {
     *
     * @default false
     */
-   transitionOpacity: boolean
+   transitionOpacity: boolean | Ref<boolean> | ComputedRef<boolean>
 }
