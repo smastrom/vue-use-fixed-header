@@ -169,7 +169,7 @@ interface UseFixedHeaderOptions {
     *
     * @default false
     */
-   transitionOpacity: Ref<boolean> | boolean
+   transitionOpacity: boolean | Ref<boolean> | ComputedRef<boolean>
 }
 ```
 
