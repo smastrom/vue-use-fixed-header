@@ -32,10 +32,6 @@ export function useFixedHeader(
 
    const { enterStyles, leaveStyles } = TRANSITION_STYLES
 
-   const root = () => (options.root || options.root === null ? unref(options.root) : null)
-   const transitionOpacity = () =>
-      options.transitionOpacity === undefined ? false : unref(options.transitionOpacity)
-
    const isReduced = useReducedMotion()
 
    // State
@@ -57,17 +53,17 @@ export function useFixedHeader(
    // Utils
 
    function getRoot() {
-      const _root = root()
+      const _root = unref(options.root)
       if (_root != null) return _root
 
       return document.documentElement
    }
 
-   function getScrollTop() {
-      const root = getRoot()
-      if (!root) return 0
+   const getScrollTop = () => getRoot().scrollTop
 
-      return root.scrollTop
+   function getScrollRoot() {
+      const root = getRoot()
+      return root === document.documentElement ? document : root
    }
 
    function isFixed() {
@@ -104,8 +100,7 @@ export function useFixedHeader(
          toggleListeners()
       })
 
-      const root = getRoot()
-      if (root) internal.resizeObserver.observe(root)
+      internal.resizeObserver.observe(getRoot())
    }
 
    function onVisible() {
@@ -115,7 +110,7 @@ export function useFixedHeader(
 
       setStyles({
          ...enterStyles,
-         ...(transitionOpacity() ? { opacity: 1 } : {}),
+         ...(unref(options.transitionOpacity) ? { opacity: 1 } : {}),
          visibility: '' as CSS['visibility'],
       })
 
@@ -125,7 +120,7 @@ export function useFixedHeader(
    function onHidden() {
       if (state.value === State.LEAVE) return
 
-      setStyles({ ...leaveStyles, ...(transitionOpacity() ? { opacity: 0 } : {}) })
+      setStyles({ ...leaveStyles, ...(unref(options.transitionOpacity) ? { opacity: 0 } : {}) })
 
       setState(State.LEAVE)
 
@@ -198,22 +193,12 @@ export function useFixedHeader(
    const onScroll = createScrollHandler()
 
    function addScrollListener() {
-      const root = getRoot()
-      if (!root) return
-
-      const scrollRoot = root === document.documentElement ? document : root
-
-      scrollRoot.addEventListener('scroll', onScroll, { passive: true })
+      getScrollRoot().addEventListener('scroll', onScroll, { passive: true })
       internal.isListeningScroll = true
    }
 
    function removeScrollListener() {
-      const root = getRoot()
-      if (!root) return
-
-      const scrollRoot = root === document.documentElement ? document : root
-
-      scrollRoot.removeEventListener('scroll', onScroll)
+      getScrollRoot().removeEventListener('scroll', onScroll)
       internal.isListeningScroll = false
    }
 
