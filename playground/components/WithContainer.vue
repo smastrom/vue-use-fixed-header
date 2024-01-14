@@ -22,9 +22,9 @@ const { styles } = useFixedHeader(headerRef, {
                <a
                   target="_blank"
                   class="Header_Button"
-                  href="https://github.com/smastrom/vue-use-fixed-header/blob/main/demo/WithContainer.vue"
+                  href="https://github.com/smastrom/vue-use-fixed-header/blob/main/playground/components/WithContainer.vue"
                >
-                  View Code
+                  See Code
                </a>
             </div>
          </header>
@@ -55,7 +55,7 @@ const { styles } = useFixedHeader(headerRef, {
 }
 
 .Header_Wrapper {
-   padding: 1rem;
+   padding: 0.875rem;
    position: sticky;
    top: 0;
 }
@@ -65,7 +65,7 @@ const { styles } = useFixedHeader(headerRef, {
    background-color: var(--AccentColor);
    display: flex;
    align-items: center;
-   padding: 1rem;
+   padding: 0.875rem;
    border-radius: 1rem;
 }
 
@@ -74,7 +74,7 @@ const { styles } = useFixedHeader(headerRef, {
 }
 
 .Header_Button {
-   color: var(--AccentColor);
+   color: var(--AccentDarkColor);
    background-color: var(--WhiteColor);
    border-radius: 0.5rem;
    line-height: 1;
@@ -87,8 +87,7 @@ const { styles } = useFixedHeader(headerRef, {
 
 @media (hover: hover) {
    .Header_Button:hover {
-      color: var(--WhiteColor);
-      background-color: var(--AccentColor);
+      background-color: var(--AccentLightColor);
    }
 }
 

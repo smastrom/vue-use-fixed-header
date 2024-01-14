@@ -5,6 +5,8 @@ import { useFixedHeader } from 'vue-use-fixed-header'
 const headerRef = ref<HTMLElement | null>(null)
 
 const { styles } = useFixedHeader(headerRef)
+
+const linkProps = { target: '_blank', class: 'Nav_List_Link' }
 </script>
 
 <template>
@@ -14,36 +16,30 @@ const { styles } = useFixedHeader(headerRef)
             <h2 class="Global_Logo">Vufh</h2>
             <ul class="Nav_List">
                <li class="Nav_List_Dropdown_Trigger Nav_List_Hidden">
-                  <a target="_blank" href="https://github.com/smastrom/vue-use-fixed-header">
+                  <a v-bind="linkProps" href="https://github.com/smastrom/vue-use-fixed-header">
                      Dropdown
                   </a>
 
                   <ul class="Nav_List_Dropdown">
-                     <li>
-                        <a target="_blank" href="#">Dropdown Item 1</a>
-                     </li>
-                     <li>
-                        <a target="_blank" href="#">Dropdown Item 2</a>
-                     </li>
-                     <li>
-                        <a target="_blank" href="#">Dropdown Item 3</a>
-                     </li>
+                     <li><a v-bind="linkProps" href="#">Dropdown Item 1</a></li>
+                     <li><a v-bind="linkProps" href="#">Dropdown Item 2</a></li>
+                     <li><a v-bind="linkProps" href="#">Dropdown Item 3</a></li>
                   </ul>
                </li>
 
                <li>
-                  <a target="_blank" href="https://github.com/smastrom/vue-use-fixed-header">
+                  <a v-bind="linkProps" href="https://github.com/smastrom/vue-use-fixed-header">
                      GitHub
                   </a>
                </li>
                <li class="Nav_List_Hidden">
-                  <a target="_blank" href="https://www.npmjs.com/package/vue-use-fixed-header"
-                     >NPM</a
-                  >
+                  <a v-bind="linkProps" href="https://www.npmjs.com/package/vue-use-fixed-header">
+                     NPM
+                  </a>
                </li>
                <li class="Nav_List_Hidden">
                   <a
-                     target="_blank"
+                     v-bind="linkProps"
                      href="https://stackblitz.com/@smastrom/collections/vue-use-fixed-header"
                   >
                      Examples
@@ -51,11 +47,11 @@ const { styles } = useFixedHeader(headerRef)
                </li>
                <li>
                   <a
-                     target="_blank"
                      class="Nav_List_Button"
-                     href="https://github.com/smastrom/vue-use-fixed-header/blob/main/demo/Header.vue"
+                     target="_blank"
+                     href="https://github.com/smastrom/vue-use-fixed-header/blob/main/playground/components/Header.vue"
                   >
-                     View Code
+                     See Code
                   </a>
                </li>
             </ul>
@@ -80,9 +76,8 @@ const { styles } = useFixedHeader(headerRef)
    border-radius: 1rem;
    width: 1280px;
    max-width: 100%;
-   height: 80px;
    margin: 1rem;
-   padding: 1rem;
+   padding: 0.875rem;
    display: flex;
    align-items: center;
    justify-content: space-between;
@@ -103,7 +98,7 @@ const { styles } = useFixedHeader(headerRef)
    align-items: center;
 }
 
-.Nav_List a {
+.Nav_List_Link {
    color: var(--TextColor);
    text-decoration: none;
    transition: color 200ms ease-in-out;
@@ -113,17 +108,12 @@ const { styles } = useFixedHeader(headerRef)
    position: relative;
 }
 
-.Nav_List_Dropdown_Trigger:hover .Nav_List_Dropdown {
-   display: flex;
-}
-
 .Nav_List_Dropdown {
    position: absolute;
-   top: 45px;
-   left: 0;
+   top: 40px;
+   left: -1rem;
    width: 200px;
    background-color: var(--WhiteColor);
-   box-shadow: var(--Shadow);
    border-radius: 0.5rem;
    padding: 1rem;
    display: none;
@@ -134,24 +124,29 @@ const { styles } = useFixedHeader(headerRef)
 
 .Nav_List_Button {
    background-color: var(--AccentColor);
-   color: var(--WhiteColor) !important;
-   padding: 0.75rem 1rem;
+   color: var(--WhiteColor);
+   padding: 0.5rem 1rem;
    border-radius: 0.5rem;
-   transition: opacity 200ms ease-in-out !important;
+   transition: all 200ms ease-in-out;
+   text-decoration: none;
 }
 
 @media (hover: hover) {
+   .Nav_List_Dropdown_Trigger:hover .Nav_List_Dropdown {
+      display: flex;
+   }
+
    .Nav_List_Dropdown_Trigger:hover > a {
       color: var(--AccentColor);
    }
 
-   .Nav_List a:hover {
+   .Nav_List_Link:hover,
+   .Nav_List_Dropdown a:hover {
       color: var(--AccentColor);
-      text-decoration: none;
    }
 
    .Nav_List_Button:hover {
-      opacity: 0.5;
+      opacity: 0.75;
    }
 }
 
@@ -162,8 +157,8 @@ const { styles } = useFixedHeader(headerRef)
    .Nav_List {
       gap: 2rem;
    }
-   .Nav_List_Hidden {
-      display: none !important;
+   .Nav_List .Nav_List_Hidden {
+      display: none;
    }
 }
 </style>
