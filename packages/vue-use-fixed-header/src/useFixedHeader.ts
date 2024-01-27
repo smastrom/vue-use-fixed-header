@@ -25,8 +25,8 @@ export function useFixedHeader(
    options: Partial<UseFixedHeaderOptions> = {},
 ): {
    styles: Readonly<CSS>
-   isLeave: Readonly<ComputedRef<boolean>>
-   isEnter: Readonly<ComputedRef<boolean>>
+   isLeave: ComputedRef<boolean>
+   isEnter: ComputedRef<boolean>
 } {
    // Config
 
