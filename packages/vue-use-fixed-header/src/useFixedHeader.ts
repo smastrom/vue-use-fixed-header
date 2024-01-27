@@ -186,7 +186,7 @@ export function useFixedHeader(
             }
          }
 
-         prevTop = getScrollTop()
+         prevTop = scrollTop
       }
    }
 
