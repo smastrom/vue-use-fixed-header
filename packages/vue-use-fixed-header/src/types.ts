@@ -17,7 +17,7 @@ export interface UseFixedHeaderOptions<T = any> {
     */
    watch: Ref<T> | ComputedRef<T>
    /**
-    * Whether to transition `opacity` propert from 0 to 1
+    * Whether to transition `opacity` property from 0 to 1
     * and vice versa along with the `transform` property
     *
     * @default false

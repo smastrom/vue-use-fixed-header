@@ -113,7 +113,7 @@ const headerRef = ref(null)
 
 const isPricingPage = computed(() => route.name === 'Pricing')
 
-const { styles } useFixedHeader(headerRef, {
+const { styles } = useFixedHeader(headerRef, {
    watch: isPricingPage, // Will perform a check everytime the value changes
 })
 </script>
@@ -164,7 +164,7 @@ interface UseFixedHeaderOptions {
     */
    watch: Ref<T> | ComputedRef<T>
    /**
-    * Whether to transition `opacity` propert from 0 to 1
+    * Whether to transition `opacity` property from 0 to 1
     * and vice versa along with the `transform` property
     *
     * @default false
