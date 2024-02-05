@@ -204,16 +204,17 @@ export function useFixedHeader(
 
    // Pointer Events
 
-   function onPointerMove(e: PointerEvent) {
-      internal.isHovering = unref(target)?.contains(e.target as Node) ?? false
-   }
+   const onPointerEnter = () => (internal.isHovering = true)
+   const onPointerLeave = () => (internal.isHovering = false)
 
    function addPointerListener() {
-      document.addEventListener('pointermove', onPointerMove)
+      unref(target)?.addEventListener('pointerenter', onPointerEnter)
+      unref(target)?.addEventListener('pointerleave', onPointerLeave)
    }
 
    function removePointerListener() {
-      document.removeEventListener('pointermove', onPointerMove)
+      unref(target)?.removeEventListener('pointerenter', onPointerEnter)
+      unref(target)?.removeEventListener('pointerleave', onPointerLeave)
    }
 
    // Listeners
